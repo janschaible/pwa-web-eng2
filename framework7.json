@@ -1,0 +1,19 @@
+{
+  "cwd": "/home/jan/DHBW/02semester/webengineering_react/pwa",
+  "type": [
+    "web"
+  ],
+  "name": "pwa-web-eng2",
+  "framework": "react",
+  "template": "blank",
+  "cssPreProcessor": false,
+  "bundler": "vite",
+  "theming": {
+    "customColor": false,
+    "color": "#007aff",
+    "darkTheme": false,
+    "iconFonts": false,
+    "fillBars": false
+  },
+  "customBuild": false
+}
