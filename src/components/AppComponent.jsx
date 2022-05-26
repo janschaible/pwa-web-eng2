@@ -11,7 +11,7 @@ import {
 import routes from '../js/routes';
 import store from '../js/store';
 
-const MyApp = () => {
+const AppComponent = () => {
 
 
   // Framework7 Parameters
@@ -42,4 +42,4 @@ const MyApp = () => {
     </App>
   );
 }
-export default MyApp;
+export default AppComponent;
