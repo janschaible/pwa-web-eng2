@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {
   Page,
   Navbar,
@@ -6,15 +6,19 @@ import {
   NavTitleLarge
 } from 'framework7-react';
 import MapComponent from '/components/Map/MapComponent'
+import PWAContext from "@/js/PWAContext";
 
-const HomePage = () => (
-  <Page name="home">
-    {/* Top Navbar */}
-    <Navbar large>
-      <NavTitle>pwa-web-eng2</NavTitle>
-      <NavTitleLarge>pwa-web-eng2</NavTitleLarge>
-    </Navbar>
-    <MapComponent/>
-  </Page>
-);
+const HomePage = () => {
+    const {destination} = useContext(PWAContext)
+    return (
+        <Page name="home">
+            {/* Top Navbar */}
+            <Navbar large>
+                <NavTitle>pwa-web-eng2</NavTitle>
+                <NavTitleLarge>pwa-web-eng2{destination?destination.coords:""}</NavTitleLarge>
+            </Navbar>
+            <MapComponent/>
+        </Page>
+    );
+}
 export default HomePage;

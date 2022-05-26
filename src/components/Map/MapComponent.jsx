@@ -1,7 +1,8 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
 import Map from 'react-map-gl';
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
+import PWAContext from "@/js/PWAContext";
 
 const initialViewState = {
     latitude: 37.7751,
@@ -14,6 +15,7 @@ const initialViewState = {
 const MapComponent = ()=>{
     mapboxgl.accessToken='pk.eyJ1IjoiamFuc2NoYWlibGUiLCJhIjoiY2wzaGN3cmRnMWFvejNjcHY4N3FnY3dseSJ9.TCNygG-kgiT3SJy1_l02yg'
     const [mapRef,setMapRef] = useState(null)
+    const {destination,setDestination} = useContext(PWAContext)
 
     const getRoute = useCallback(async (end) => {
             if (mapRef==null){
@@ -73,6 +75,11 @@ const MapComponent = ()=>{
         map.on('click', (event) => {
             console.log("coordinates",Object.keys(event.lngLat).map((key) => event.lngLat[key]))
             const coords = Object.keys(event.lngLat).map((key) => event.lngLat[key]);
+            setDestination(dest=>{
+                const newDest = {...dest}
+                newDest.coords = coords
+                return newDest
+            })
             const end = {
                 type: 'FeatureCollection',
                 features: [
