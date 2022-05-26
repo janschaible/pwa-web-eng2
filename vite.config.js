@@ -1,7 +1,7 @@
 
 import path from 'path';
 import reactRefresh from '@vitejs/plugin-react-refresh';
-
+import react from '@vitejs/plugin-react'
 
 
 const SRC_DIR = path.resolve(__dirname, './src');
@@ -10,8 +10,8 @@ const BUILD_DIR = path.resolve(__dirname, './www',);
 
 export default {
   plugins: [
+    react(),
     reactRefresh(),
-
   ],
   root: SRC_DIR,
   base: '',

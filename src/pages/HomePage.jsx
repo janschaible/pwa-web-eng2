@@ -5,7 +5,7 @@ import {
   NavTitle,
   NavTitleLarge
 } from 'framework7-react';
-import MapComponent from '/components/Map/Map'
+import MapComponent from '/components/Map/MapComponent'
 
 const HomePage = () => (
   <Page name="home">
