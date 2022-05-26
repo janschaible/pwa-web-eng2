@@ -11,7 +11,6 @@ const initialViewState = {
 };
 
 const MapComponent = ()=>{
-    console.log(process.env.REACT_APP_MAPBOX_ACCESS_TOKEN)
     return (
     <Map
         initialViewState={initialViewState}
