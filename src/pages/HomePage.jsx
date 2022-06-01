@@ -12,11 +12,6 @@ const HomePage = () => {
     const {destination} = useContext(PWAContext)
     return (
         <Page name="home">
-            {/* Top Navbar */}
-            <Navbar large>
-                <NavTitle>pwa-web-eng2</NavTitle>
-                <NavTitleLarge>pwa-web-eng2{destination?destination.coords:""}</NavTitleLarge>
-            </Navbar>
             <MapComponent/>
         </Page>
     );
