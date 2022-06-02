@@ -1,18 +1,42 @@
 import "leaflet-routing-machine/src/localization.js" 
-import { useEffect,useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import L from "leaflet";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine";
 import { useMap } from "react-leaflet";
+import { useDispatch, useSelector } from "react-redux";
+import {setInstruction} from '@/features/routing/routingSlice'
 
 const Routing = () => {
   const map = useMap()
+  const dispatch = useDispatch()
+  const currentPosition = useSelector(state=>state.routing.currentPosition)
+  const targetPosition = useSelector(state=>state.routing.targetPosition)
+  const routingActive = useSelector(state=>state.routing.routingActive)
+  const [routingControl,setRoutingControl] = useState()
 
-  useEffect(() => {
+  const spliceWaypoints = useCallback((cp)=>{
+    if(!routingControl)return
+    routingControl.spliceWaypoints(0, 1, L.latLng(cp[0],cp[1]));
+  },[routingControl])
+
+  useEffect(()=>{
+    spliceWaypoints(currentPosition)
+  },[currentPosition])
+
+  const initializeRouting = useCallback(()=>{
     if (!map) return;
+    if(routingControl){
+      map.removeControl(routingControl)
+      setRoutingControl(null)
+    }
+    if(!routingActive || !targetPosition)return
 
-    const routingControl = L.Routing.control({
-      waypoints: [L.latLng(51.505,-0.09), L.latLng(57.6792, 11.949)],
+    const control = L.Routing.control({
+      waypoints: [
+        L.latLng(currentPosition[0],currentPosition[1]), 
+        L.latLng(targetPosition[0], targetPosition[1])
+      ],
       lineOptions: {
         styles: [
           {
@@ -26,30 +50,34 @@ const Routing = () => {
       draggableWaypoints: false,
       fitSelectedRoutes: false,
       showAlternatives: false,
-      altLineOptions:{
-        styles: [
-          {
-            color: "gray",
-            opacity: 0.2,
-            weight: 4
-          }
-        ]
-      },
+      routeWhileDragging: true,
       router: L.Routing.osrmv1({
         language: 'de'
       }),
       show:false
     }).addTo(map)
-    routingControl._container.style.display = "None";//hide itinerary show:false did not remove container
 
-    routingControl.on('routeselected', function(e) {
-      var coord = e.route.coordinates;
+    control._container.style.display = "None";//hide itinerary show:false did not remove container
+
+    control.on('routeselected', function(e) {
       var instr = e.route.instructions;
-      console.log(instr)
-    });    
+      if(Array.isArray(instr[0])){
+        instr = instr[0]
+      }
+      dispatch(setInstruction(instr[0]))
+    });
 
-    return () => map.removeControl(routingControl)
-  }, [map])
+    setRoutingControl(control)
+    return ()=> {
+      map.removeControl(control)
+      setRoutingControl(null)
+    }
+  },[map,targetPosition,currentPosition,routingActive])
+
+  useEffect(() => {
+    return initializeRouting()
+  }, [map,routingActive])
+
   return null
 }
 

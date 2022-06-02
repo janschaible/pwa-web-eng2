@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Provider } from 'react-redux';
 import Store from '@/js/store'
 
@@ -8,9 +6,8 @@ import {
   View,
 } from 'framework7-react';
 
-
 import routes from '../js/routes';
-import {PWAContextProvider} from "../js/PWAContext";
+import getLocation from '@/js/locating'
 
 const AppComponent = () => {
   const f7params = {
@@ -21,13 +18,11 @@ const AppComponent = () => {
   };
 
   return (
-    <PWAContextProvider>
-      <Provider store={Store}>
-        <App { ...f7params } >
-          <View main className="view-main" url="/" />
-        </App>
-      </Provider>
-    </PWAContextProvider>
+    <Provider store={Store}>
+      <App { ...f7params } >
+        <View main className="view-main" url="/" />
+      </App>
+    </Provider>
   );
 }
 export default AppComponent;

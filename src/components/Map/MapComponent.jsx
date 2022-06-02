@@ -1,40 +1,74 @@
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Map} from './MapComponent.elements'
-import {Marker,WMSTileLayer,TileLayer,Popup,useMapEvents}from 'react-leaflet'
+import {TileLayer,useMapEvents}from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
 import { useDispatch, useSelector } from 'react-redux';
-import {setMapPosition} from '@/features/routing/routingSlice'
+import {setMapPosition,setMapZoom,setCurrentPosition,setFollowing} from '@/features/routing/routingSlice'
+import { f7 } from 'framework7-react';
 
 const EventHandeler = ()=>{
     const dispatch = useDispatch()
+    const [locatingError,setLocatingError] = useState(false)
+    const following = useSelector(state=>state.routing.following)
+    const routingActive = useSelector(state=>state.routing.routingActive)
+
     const map = useMapEvents({
         zoomend:()=>{
-            //console.log(map.getZoom())      //todo set into state
+            //zoom in on mouse position changes position of map
+            const center = map.getCenter()
+            dispatch(setMapPosition([center.lat,center.lng]))
+            dispatch(setMapZoom(map.getZoom()))
         },
         drag:()=>{
             const center = map.getCenter()
             dispatch(setMapPosition([center.lat,center.lng]))
+            dispatch(setFollowing(false))
         }
     });
+
+    const updateLocation =  useCallback(()=>{
+        window.navigator.geolocation.getCurrentPosition(position=>{
+            const lat = position.coords.latitude
+            const long = position.coords.longitude
+            dispatch(setCurrentPosition([lat,long]))
+            if(following){
+                //sets the map position
+                dispatch(setMapPosition([lat,long]))
+            }
+            setLocatingError(false)
+        }, ()=>setLocatingError(true))
+    },[])
+
+    useEffect(()=>{
+        updateLocation() //sets the current location on startup
+    },[])
+
+    useEffect(()=>{
+        if(!routingActive)return
+        //fly on load to lcation of user
+        window.navigator.geolocation.getCurrentPosition(position=>{
+            map.flyTo([position.coords.latitude,position.coords.longitude],map.getZoom())
+        })
+
+        //start location polling
+        const locationGetter = setInterval(updateLocation,3000)
+        return ()=>clearInterval(locationGetter)
+    },[routingActive])
+
+    //alert user if we cannot get their location
+    useEffect(()=>{
+        if(locatingError){
+            f7.dialog.alert("Leider konnten wir ihre position nicht feststellen")
+        }
+    },[locatingError])
+
     return <></>
 }
 
-/*
-
-            <TileLayer
-            noWrap={true}
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <WMSTileLayer
-                layers={'TOPO-OSM-WMS'}
-                url={`http://ows.mundialis.de/services/service?`}
-            />
-*/
-
 const MapComponent = ()=>{
     const position = useSelector(state=>state.routing.mapPosition)
+    const zoom = useSelector(state=>state.routing.mapZoom)
 
     const [mapRef,setMapRef] = useState(null)
     const mapRefCallback = useCallback(ref=>{
@@ -45,14 +79,14 @@ const MapComponent = ()=>{
         if(mapRef==null){
             return
         }
-        mapRef.setView(position,mapRef.getZoom())
-    },[mapRef,position])
+        mapRef.setView(position,zoom)
+    },[mapRef,position,zoom])
 
     return (
         <Map
             ref={mapRefCallback}
             center={position}
-            zoom={13} 
+            zoom={zoom} 
             attributionControl={false}
             zoomControl={false}
             maxBounds={[
@@ -63,10 +97,10 @@ const MapComponent = ()=>{
             minZoom={3}  
         >
             <TileLayer
-                url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
-                subdomains={['mt1','mt2','mt3']}
+                noWrap={true}
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            
             <Routing/>
             <EventHandeler/>
       </Map>
@@ -74,3 +108,22 @@ const MapComponent = ()=>{
 }
 
 export default MapComponent
+
+/*
+
+            <TileLayer
+                url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+                maxZoom={20}
+                subdomains={['mt1','mt2','mt3']}
+            />
+            
+            <TileLayer
+            noWrap={true}
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <WMSTileLayer
+                layers={'TOPO-OSM-WMS'}
+                url={`http://ows.mundialis.de/services/service?`}
+            />
+*/
