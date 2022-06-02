@@ -3,15 +3,15 @@ import { createSlice } from "@reduxjs/toolkit";
 export const routingSlice = createSlice({
     name:'routing',
     initialState:{
-        value:1
+        mapPosition:[51.505, -0.09]
     },
     reducers:{
-        increment:(state)=>{
-            state.value++
+        setMapPosition:(state,action)=>{
+            state.mapPosition = action.payload
         }
     }
 })
 
-export const {increment} = routingSlice.actions
+export const {setMapPosition} = routingSlice.actions
 
 export default routingSlice.reducer

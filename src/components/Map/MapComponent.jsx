@@ -4,17 +4,17 @@ import {Marker,WMSTileLayer,TileLayer,Popup,useMapEvents}from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
 import { useDispatch, useSelector } from 'react-redux';
-import {increment} from '@/features/routing/routingSlice'
+import {setMapPosition} from '@/features/routing/routingSlice'
 
 const EventHandeler = ()=>{
     const dispatch = useDispatch()
     const map = useMapEvents({
         zoomend:()=>{
             //console.log(map.getZoom())      //todo set into state
-            dispatch(increment())
         },
         drag:()=>{
-            //console.log(map.getCenter())    //todo set into state
+            const center = map.getCenter()
+            dispatch(setMapPosition([center.lat,center.lng]))
         }
     });
     return <></>
@@ -34,16 +34,24 @@ const EventHandeler = ()=>{
 */
 
 const MapComponent = ()=>{
-    const position = [51.505, -0.09]
-    const count = useSelector(state=>state.routing.value)
+    const position = useSelector(state=>state.routing.mapPosition)
+
+    const [mapRef,setMapRef] = useState(null)
+    const mapRefCallback = useCallback(ref=>{
+        setMapRef(ref)
+    },[])
 
     useEffect(()=>{
-        console.log(count)
-    },[count])
+        if(mapRef==null){
+            return
+        }
+        mapRef.setView(position,mapRef.getZoom())
+    },[mapRef,position])
 
     return (
         <Map
-            center={position} 
+            ref={mapRefCallback}
+            center={position}
             zoom={13} 
             attributionControl={false}
             zoomControl={false}
@@ -52,21 +60,15 @@ const MapComponent = ()=>{
                 [90,180]
             ]}
             maxBoundsViscosity={0.8}
-            minZoom={3}        
+            minZoom={3}  
         >
             <TileLayer
                 url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
-                maxZoom= {20}
                 subdomains={['mt1','mt2','mt3']}
             />
             
             <Routing/>
             <EventHandeler/>
-            <Marker position={position}>
-                <Popup>
-                    A pretty CSS3 popup. <br /> Easily customizable.
-                </Popup>
-            </Marker>
       </Map>
   )
 }
