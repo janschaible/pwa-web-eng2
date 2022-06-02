@@ -3,14 +3,18 @@ import {Map} from './MapComponent.elements'
 import {Marker,WMSTileLayer,TileLayer,Popup,useMapEvents}from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
+import { useDispatch, useSelector } from 'react-redux';
+import {increment} from '@/features/routing/routingSlice'
 
 const EventHandeler = ()=>{
+    const dispatch = useDispatch()
     const map = useMapEvents({
         zoomend:()=>{
-            console.log(map.getZoom())      //todo set into state
+            //console.log(map.getZoom())      //todo set into state
+            dispatch(increment())
         },
         drag:()=>{
-            console.log(map.getCenter())    //todo set into state
+            //console.log(map.getCenter())    //todo set into state
         }
     });
     return <></>
@@ -31,6 +35,11 @@ const EventHandeler = ()=>{
 
 const MapComponent = ()=>{
     const position = [51.505, -0.09]
+    const count = useSelector(state=>state.routing.value)
+
+    useEffect(()=>{
+        console.log(count)
+    },[count])
 
     return (
         <Map

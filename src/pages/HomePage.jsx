@@ -1,9 +1,6 @@
 import React, {useContext} from 'react';
 import {
-  Page,
-  Navbar,
-  NavTitle,
-  NavTitleLarge
+  Page
 } from 'framework7-react';
 import MapComponent from '/components/Map/MapComponent'
 import PWAContext from "@/js/PWAContext";

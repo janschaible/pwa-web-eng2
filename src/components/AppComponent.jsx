@@ -1,5 +1,8 @@
 import React from 'react';
 
+import { Provider } from 'react-redux';
+import Store from '@/js/store'
+
 import {
   App,
   View,
@@ -19,9 +22,11 @@ const AppComponent = () => {
 
   return (
     <PWAContextProvider>
-      <App { ...f7params } >
-        <View main className="view-main" url="/" />
-      </App>
+      <Provider store={Store}>
+        <App { ...f7params } >
+          <View main className="view-main" url="/" />
+        </App>
+      </Provider>
     </PWAContextProvider>
   );
 }
