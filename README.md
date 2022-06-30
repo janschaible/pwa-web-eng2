@@ -1,5 +1,10 @@
 # pwa-web-eng2
 
+## Targeted view
+### Selecting target location
+![](readme_images/target_selection.png)
+### Navigating to target
+![](readme_images/navigating.png)
 ## Framework7 CLI Options
 
 Framework7 app created with following options:
