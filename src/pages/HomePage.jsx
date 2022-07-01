@@ -1,32 +1,35 @@
-import { useCallback } from 'react';
 import {
-  Page
+    Page,
+    Card,
+    CardHeader
 } from 'framework7-react';
-import {NavigateButton}from './HomePage.elements'
 
-import { setRoutingActive } from '@/features/routing/routingSlice';
 import MapComponent from '/components/Map/MapComponent'
-import { useDispatch, useSelector } from 'react-redux';
+import {Overlay} from "./HomePage.elements";
+import {useDispatch, useSelector} from "react-redux";
+import {setRoutingActive} from '@/features/routing/routingSlice'
+
 
 const HomePage = () => {
     const dispatch = useDispatch()
-    const routingActive = useSelector(state=>state.routing.routingActive)
-    const currentPosition = useSelector(state=>state.routing.currentPosition)
-    const navigate = useCallback(()=>{
-        dispatch(setRoutingActive(!routingActive))
-    },[routingActive])
+
+    const instruction = useSelector(state=>state.routing.instruction)
+    let instructionElement = null
+    if(instruction){
+        instructionElement=
+            <Card>
+                <CardHeader>
+                    {instruction.text}
+                </CardHeader>
+            </Card>
+    }
 
     return (
         <Page name="home">
             <MapComponent/>
-            <NavigateButton 
-                large fill round
-                onClick={navigate}
-                routingActive={routingActive}
-                visible={currentPosition!=null}
-            >
-              Navigieren
-            </NavigateButton>
+            <Overlay>
+                {instructionElement}
+            </Overlay>
         </Page>
     );
 }

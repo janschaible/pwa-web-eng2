@@ -7,8 +7,6 @@ const getItemFromStorage = (itemName, fallbackValue) => {
     return JSON.parse(item)
 }
 
-const initialMapPosition = localStorage.getItem("mapPosition")
-
 export const routingSlice = createSlice({
     name: 'routing',
     initialState: {
