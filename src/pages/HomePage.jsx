@@ -12,6 +12,7 @@ import {setRoutingActive} from '@/features/routing/routingSlice'
 
 const HomePage = () => {
     const dispatch = useDispatch()
+    const routingActive = useSelector(state => state.routing.routingActive)
 
     const instruction = useSelector(state=>state.routing.instruction)
     let instructionElement = null
@@ -29,6 +30,11 @@ const HomePage = () => {
             <MapComponent/>
             <Overlay>
                 {instructionElement}
+                <button onClick={()=>{
+                    dispatch(setRoutingActive(!routingActive))
+                }}>
+                    navigate
+                </button>
             </Overlay>
         </Page>
     );

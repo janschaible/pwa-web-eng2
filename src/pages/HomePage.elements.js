@@ -6,6 +6,8 @@ export const Overlay = styled.div`
   left: 0;
   right: 0;
   z-index: 1000;
+  pointer-events: none;
+  *{
+    pointer-events: all;
+  }
 `
-
-//${props=>props.visible?"translate(0)":"translate(0, calc(1.5rem+100%))"}
