@@ -34,7 +34,6 @@ export const routingSlice = createSlice({
             const mapZom = localStorage.mapZoom;
             const pages = findWikiEntries(coordLat, coordLon, mapZom);
             const collections = pages;
-            console.log(collections);
         },
         setTargetPosition: () => {
             state.targetPosition = action.targetPosition

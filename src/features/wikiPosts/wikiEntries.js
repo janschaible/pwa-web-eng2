@@ -11,7 +11,6 @@ export function findWikiEntries(lat, lon, mapZoom) {
       gsradius = gsradius + 150;
       maxfinds = ( mapZoom / 2 );
       maxfinds = Math.ceil(maxfinds);
-      console.log(maxfinds);
     }
   } else {
     gsradius = 1000;
