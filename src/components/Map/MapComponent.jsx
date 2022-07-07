@@ -1,100 +1,114 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {Map} from './MapComponent.elements'
-import {TileLayer,useMapEvents}from 'react-leaflet'
+import {TileLayer, useMapEvents} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
-import { useDispatch, useSelector } from 'react-redux';
-import {setMapPosition,setMapZoom,setCurrentPosition,setFollowing} from '@/features/routing/routingSlice'
-import { f7 } from 'framework7-react';
+import {useDispatch, useSelector} from 'react-redux';
+import {setMapPosition, setMapZoom, setCurrentPosition, setFollowing} from '@/features/routing/routingSlice'
+import {f7} from 'framework7-react';
+import {findWikiEntries} from "../../features/wikiPosts/wikiEntries";
 
-const EventHandeler = ()=>{
+const EventHandeler = () => {
     const dispatch = useDispatch()
-    const [locatingError,setLocatingError] = useState(false)
-    const following = useSelector(state=>state.routing.following)
-    const routingActive = useSelector(state=>state.routing.routingActive)
+    const [locatingError, setLocatingError] = useState(false)
+    const following = useSelector(state => state.routing.following)
+    const routingActive = useSelector(state => state.routing.routingActive)
+    const mapPosition = useSelector(state => state.routing.mapPosition)
+    const mapZoom = useSelector(state => state.routing.mapZoom)
+    const wikiCollection = findWikiEntries(mapPosition[0], mapPosition[1], mapZoom)
 
     const map = useMapEvents({
-        zoomend:()=>{
+        zoomend: () => {
             //zoom in on mouse position changes position of map
             const center = map.getCenter()
-            dispatch(setMapPosition([center.lat,center.lng]))
+            dispatch(setMapPosition([center.lat, center.lng]))
             dispatch(setMapZoom(map.getZoom()))
         },
-        drag:()=>{
+        drag: () => {
             const center = map.getCenter()
-            dispatch(setMapPosition([center.lat,center.lng]))
+            dispatch(setMapPosition([center.lat, center.lng]))
             dispatch(setFollowing(false))
         }
     });
 
-    const updateLocation =  useCallback(()=>{
-        window.navigator.geolocation.getCurrentPosition(position=>{
+    const updateLocation = useCallback(() => {
+        window.navigator.geolocation.getCurrentPosition(position => {
             const lat = position.coords.latitude
             const long = position.coords.longitude
-            dispatch(setCurrentPosition([lat,long]))
-            if(following){
+            dispatch(setCurrentPosition([lat, long]))
+            if (following) {
                 //sets the map position
-                dispatch(setMapPosition([lat,long]))
+                dispatch(setMapPosition([lat, long]))
             }
             setLocatingError(false)
-        }, ()=>setLocatingError(true))
-    },[])
+        }, () => setLocatingError(true))
+    }, [])
 
-    useEffect(()=>{
+    useEffect(() => {
         updateLocation() //sets the current location on startup
-    },[])
+    }, [])
 
-    useEffect(()=>{
-        if(!routingActive)return
+    //Creates Marker at locations returned from wikiAPI-call
+    //Currently works only when debugging and setting a breakpoint before for-loop (Line 56)
+    useEffect(() => {
+        console.log(wikiCollection)
+        for (let i = 0; i < wikiCollection.length; i++) {
+            const marker = L.marker([wikiCollection[i].lat, wikiCollection[i].lon], {title: wikiCollection[i].title}).addTo(map)
+            currentMarker.push(marker)
+        }
+    }, [mapPosition])
+
+    useEffect(() => {
+        if (!routingActive) return
         //fly on load to lcation of user
-        window.navigator.geolocation.getCurrentPosition(position=>{
-            map.flyTo([position.coords.latitude,position.coords.longitude],map.getZoom())
+        window.navigator.geolocation.getCurrentPosition(position => {
+            map.flyTo([position.coords.latitude, position.coords.longitude], map.getZoom())
         })
 
         //start location polling
-        const locationGetter = setInterval(updateLocation,3000)
-        return ()=>clearInterval(locationGetter)
-    },[routingActive])
+        const locationGetter = setInterval(updateLocation, 3000)
+        return () => clearInterval(locationGetter)
+    }, [routingActive])
 
-    //alert user if we cannot get their location
-    useEffect(()=>{
-        if(locatingError){
+//alert user if we cannot get their location
+    useEffect(() => {
+        if (locatingError) {
             f7.dialog.alert("Leider konnten wir ihre position nicht feststellen")
         }
-    },[locatingError])
+    }, [locatingError])
 
     return <></>
 }
 
-const MapComponent = ()=>{
-    const position = useSelector(state=>state.routing.mapPosition)
-    const zoom = useSelector(state=>state.routing.mapZoom)
+const MapComponent = () => {
+    const position = useSelector(state => state.routing.mapPosition)
+    const zoom = useSelector(state => state.routing.mapZoom)
 
-    const [mapRef,setMapRef] = useState(null)
-    const mapRefCallback = useCallback(ref=>{
+    const [mapRef, setMapRef] = useState(null)
+    const mapRefCallback = useCallback(ref => {
         setMapRef(ref)
-    },[])
+    }, [])
 
-    useEffect(()=>{
-        if(mapRef==null){
+    useEffect(() => {
+        if (mapRef == null) {
             return
         }
-        mapRef.setView(position,zoom)
-    },[mapRef,position,zoom])
+        mapRef.setView(position, zoom)
+    }, [mapRef, position, zoom])
 
     return (
         <Map
             ref={mapRefCallback}
             center={position}
-            zoom={zoom} 
+            zoom={zoom}
             attributionControl={false}
             zoomControl={false}
             maxBounds={[
-                [-90,-180],
-                [90,180]
+                [-90, -180],
+                [90, 180]
             ]}
             maxBoundsViscosity={0.8}
-            minZoom={3}  
+            minZoom={3}
         >
             <TileLayer
                 noWrap={true}
@@ -103,8 +117,8 @@ const MapComponent = ()=>{
             />
             <Routing/>
             <EventHandeler/>
-      </Map>
-  )
+        </Map>
+    )
 }
 
 export default MapComponent
