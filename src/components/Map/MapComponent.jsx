@@ -54,7 +54,6 @@ const EventHandeler = () => {
         console.log(wikiCollection)
         for (let i = 0; i < wikiCollection.length; i++) {
             const marker = L.marker([wikiCollection[i].lat, wikiCollection[i].lon], {title: wikiCollection[i].title}).addTo(map)
-            currentMarker.push(marker)
         }
     }, [mapPosition])
 
