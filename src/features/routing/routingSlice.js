@@ -18,7 +18,7 @@ export const routingSlice = createSlice({
         routingActive: false,
         following: false,
         showLastPath: getItemFromStorage("showLastPath",true),
-        lastPath:test
+        lastPath:[]
     },
     reducers: {
         setMapPosition: (state, action) => {
