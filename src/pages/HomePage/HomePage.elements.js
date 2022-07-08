@@ -21,7 +21,7 @@ export const SettingsButton = styled(Link)`
   font-size: 2rem;
   border-radius: 50%;
   border-style: none;
-  background-color: white;
+  background-color: #EEE;
   box-shadow: 2px 2px 1px black;
   margin: calc(var(--f7-card-margin-horizontal) + var(--f7-safe-area-right));
   align-self: flex-end;
