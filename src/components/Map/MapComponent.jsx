@@ -51,6 +51,7 @@ const EventHandeler = () => {
             const lat = position.coords.latitude
             const long = position.coords.longitude
             map.flyTo([lat,long],map.getZoom())
+            console.log("flyto 1")
             dispatch(setCurrentPosition([lat,long]))
         }, ()=>setLocatingError(true))
     },[startUp])
@@ -63,19 +64,28 @@ const EventHandeler = () => {
         }
         //fly on load to location of user on navigation start
         window.navigator.geolocation.getCurrentPosition(position=>{
+            if(!routingActive){
+                return //check again because of delay
+            }
+            console.log("routing active")
             const lat = position.coords.latitude
             const long = position.coords.longitude
             map.flyTo([lat,long],map.getZoom())
+            console.log("flyto 2")
             dispatch(setCurrentPosition([lat,long]))
         }, ()=>setLocatingError(true))
 
         //start location polling
         const locationGetter = setInterval(()=>{
             window.navigator.geolocation.getCurrentPosition(position=>{
+                if(!routingActive){
+                    return //check again because of delay
+                }
                 const lat = position.coords.latitude
                 const long = position.coords.longitude
                 if(following){
                     map.flyTo([lat,long],map.getZoom())
+                    console.log("flyto 3")
                 }
                 dispatch(setCurrentPosition([lat,long]))
                 setLocatingError(false)
@@ -89,6 +99,7 @@ const EventHandeler = () => {
     useEffect(()=>{
         if(!targetPosition)return
         map.flyTo([targetPosition.lat,targetPosition.lon],map.getZoom())
+        console.log("flyto 4")
     },[targetPosition])
 
     //alert user if we cannot get their location

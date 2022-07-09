@@ -5,7 +5,7 @@ import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine";
 import { useMap } from "react-leaflet";
 import { useDispatch, useSelector } from "react-redux";
-import {setInstruction} from '@/features/routing/routingSlice'
+import {setInstruction,setRoutingActive} from '@/features/routing/routingSlice'
 
 const Routing = () => {
   const map = useMap()
@@ -16,12 +16,17 @@ const Routing = () => {
   const [routingControl,setRoutingControl] = useState()
 
   const spliceWaypoints = useCallback((cp)=>{
-    if(!routingControl)return
-    routingControl.spliceWaypoints(0, 1, L.latLng(cp[0],cp[1]));
-  },[routingControl])
+    if(!routingControl||!map)return
+    try{  
+      routingControl.spliceWaypoints(0, 1, L.latLng(cp[0],cp[1]));
+    }catch (e){
+      dispatch(setRoutingActive(false))
+      return;
+    }
+  },[routingControl,map])
 
   useEffect(()=>{
-    spliceWaypoints(currentPosition)
+      spliceWaypoints(currentPosition)
   },[currentPosition])
 
   const initializeRouting = useCallback(()=>{
@@ -56,8 +61,15 @@ const Routing = () => {
         language: 'de'
       }),
       show:false
-    }).addTo(map)
+    })
+    if(!map)returncreateSlice
 
+    try{
+      control.createAlternativesContainer().addTo(map)
+    }catch (e){
+      dispatch(setRoutingActive(false))
+      return;
+    }
     control._container.style.display = "None";//hide itinerary show:false did not remove container
 
     control.on('routeselected', function(e) {
@@ -70,6 +82,7 @@ const Routing = () => {
 
     setRoutingControl(control)
     return ()=> {
+      if(!map)return;
       map.removeControl(control)
       setRoutingControl(null)
     }
