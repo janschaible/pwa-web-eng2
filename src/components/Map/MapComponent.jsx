@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setMapPosition, setMapZoom, setCurrentPosition, setFollowing} from '@/features/routing/routingSlice'
 import {f7} from 'framework7-react';
 import {findWikiEntries} from "../../features/wikiPosts/wikiEntries";
+import {setTargetPosition} from '@/features/routing/routingSlice'
 
 const EventHandeler = () => {
     const dispatch = useDispatch()
@@ -14,8 +15,6 @@ const EventHandeler = () => {
     const [locationPoller,setLocationPoller] = useState()
     const following = useSelector(state=>state.routing.following)
     const routingActive = useSelector(state=>state.routing.routingActive)
-    const mapPosition = useSelector(state => state.routing.mapPosition)
-    const mapZoom = useSelector(state => state.routing.mapZoom)
 
     const map = useMapEvents({
         zoomend: () => {
@@ -94,6 +93,9 @@ const EventHandeler = () => {
 
 const MapComponent = ()=>{
     const [wikiEntries, setWikiEntries] = useState()
+    
+    const dispatch = useDispatch()
+    const routingActive = useSelector(state=>state.routing.routingActive)
     const mapPosition = useSelector(state=>state.routing.mapPosition)
     const mapZoom = useSelector(state=>state.routing.mapZoom)
     const showLastPath = useSelector(state=>state.routing.showLastPath)
@@ -131,7 +133,14 @@ const MapComponent = ()=>{
         }        
         getMarkers()
     }, [mapPosition,mapZoom])
-    
+
+    const getEventHandler = useCallback(
+        (entrie) => ({
+            click: ()=>{
+                console.log(entrie)
+                dispatch(setTargetPosition(entrie))
+          },
+        }),[])
 
     return (
         <Map
@@ -153,12 +162,17 @@ const MapComponent = ()=>{
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {getLastPathPoly()}
-            {wikiEntries ? wikiEntries.map(entrie=>{
-                return <Marker 
-                    key={entrie.pageid} 
-                    position={[entrie.lat, entrie.lon]} 
-                    title={entrie.title}
-                />
+            {wikiEntries && !routingActive ? wikiEntries.map(entrie=>{
+                return(     
+                    <Marker
+                        key={entrie.pageid} 
+                        position={[entrie.lat, entrie.lon]} 
+                        eventHandlers={getEventHandler(entrie)}
+                        title={entrie.title}
+                    >
+
+                    </Marker>
+                )
             }):<></>}
             <Routing/>
             <EventHandeler/>

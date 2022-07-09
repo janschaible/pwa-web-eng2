@@ -36,7 +36,7 @@ const Routing = () => {
     const control = L.Routing.control({
       waypoints: [
         L.latLng(currentPosition[0],currentPosition[1]), 
-        L.latLng(targetPosition[0], targetPosition[1])
+        L.latLng(targetPosition.lat, targetPosition.lon)
       ],
       lineOptions: {
         styles: [

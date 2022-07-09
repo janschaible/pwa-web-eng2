@@ -13,7 +13,7 @@ export const routingSlice = createSlice({
         mapPosition: getItemFromStorage("mapPosition", [0, 0]),
         mapZoom: getItemFromStorage("mapZoom", 15),
         currentPosition: null,
-        targetPosition: [49, 9],
+        targetPosition: null,
         instruction: null,
         routingActive: false,
         following: false,
@@ -39,8 +39,8 @@ export const routingSlice = createSlice({
             const pages = findWikiEntries(coordLat, coordLon, mapZom);
             const collections = pages;
         },
-        setTargetPosition: () => {
-            state.targetPosition = action.targetPosition
+        setTargetPosition: (state, action) => {
+            state.targetPosition = action.payload
         },
         setInstruction: (state, action) => {
             state.instruction = action.payload

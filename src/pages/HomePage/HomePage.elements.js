@@ -57,5 +57,7 @@ export const SheetControlButton = styled(Button)`
     width: 25%;
     margin-left: auto;
     margin-right: auto;
+    left: 0;
+    right: 0;
 `
 //${props=>props.visible?"translate(0)":"translate(0, calc(1.5rem+100%))"}
