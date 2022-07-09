@@ -50,7 +50,7 @@ const HomePage = () => {
             <MapComponent/>
             <Overlay>
                     {instructionElement}
-                <SettingsButton href="/settings/">
+                <SettingsButton href="/settings">
                     <FontAwesomeIcon icon={faList} />
                 </SettingsButton>
             </Overlay>

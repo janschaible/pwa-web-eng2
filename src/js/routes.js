@@ -12,14 +12,14 @@ var routes = [
     },
   },
   {
-    path: '/settings/',
+    path: '/settings',
     component: SettingsPage,
     options: {
       transition: 'f7-cover-v',
     },
   },
   {
-    path: '/settings/recent-destinations/',
+    path: '/settings/recent-destinations',
     component: RecentDestinations,
     options: {
       transition: 'f7-cover-v',

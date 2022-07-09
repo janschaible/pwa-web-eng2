@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import { Link,List } from 'framework7-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export const Container = styled.div`
     margin: 0 auto;
@@ -25,4 +26,12 @@ export const BackButton = styled(Link)`
 
 export const ItemList = styled(List)`
     align-self: stretch;
+`
+
+export const PageIcon = styled(FontAwesomeIcon)`
+    height: 5rem;
+    width: 5rem;
+    padding: 2rem;
+    background-color: #EEE;
+    border-radius: 50%;
 `
