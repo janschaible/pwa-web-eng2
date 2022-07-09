@@ -15,7 +15,6 @@ const EventHandeler = () => {
     const routingActive = useSelector(state => state.routing.routingActive)
     const mapPosition = useSelector(state => state.routing.mapPosition)
     const mapZoom = useSelector(state => state.routing.mapZoom)
-    const wikiCollection = findWikiEntries(mapPosition[0], mapPosition[1], mapZoom)
 
     const map = useMapEvents({
         zoomend: () => {
@@ -51,10 +50,14 @@ const EventHandeler = () => {
     //Creates Marker at locations returned from wikiAPI-call
     //Currently works only when debugging and setting a breakpoint before for-loop (Line 56)
     useEffect(() => {
-        console.log(wikiCollection)
-        for (let i = 0; i < wikiCollection.length; i++) {
-            const marker = L.marker([wikiCollection[i].lat, wikiCollection[i].lon], {title: wikiCollection[i].title}).addTo(map)
+        const getMarkers = async ()=>{
+            const wikiCollection = await findWikiEntries(mapPosition[0], mapPosition[1], mapZoom)
+            console.log(wikiCollection)
+            for (let i = 0; i < wikiCollection.length; i++) {
+                const marker = L.marker([wikiCollection[i].lat, wikiCollection[i].lon], {title: wikiCollection[i].title}).addTo(map)
+            }    
         }
+        getMarkers()
     }, [mapPosition])
 
     useEffect(() => {

@@ -1,4 +1,4 @@
-export function findWikiEntries(lat, lon, mapZoom) {
+export async function findWikiEntries(lat, lon, mapZoom) {
   const collection = [];
   var gsradius;
   var maxfinds;
@@ -30,14 +30,15 @@ export function findWikiEntries(lat, lon, mapZoom) {
     ;
   url = url + "?origin=*";
   Object.keys(params).forEach(function (key) { url += "&" + key + "=" + params[key]; });
-  fetch(url)
-    .then(function (response) { return response.json(); })
-    .then(function (response) {
-      const pages = response.query.geosearch;
-      for (var place in pages) {
-        collection.push(pages[place]);
-      }
-    })
-    .catch(function (error) { });
+  try{
+    const response = await fetch(url)
+    const marsheledResponse = await response.json()
+    const pages = marsheledResponse.query.geosearch;
+    for (var place in pages) {
+      collection.push(pages[place]);
+    }
+  }catch{
+    console.log("failed to get wiki entries")
+  }
   return collection;
 }
