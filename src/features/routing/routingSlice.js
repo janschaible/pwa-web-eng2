@@ -7,8 +7,6 @@ const getItemFromStorage = (itemName, fallbackValue) => {
     return JSON.parse(item)
 }
 
-const initialMapPosition = localStorage.getItem("mapPosition")
-
 export const routingSlice = createSlice({
     name: 'routing',
     initialState: {
@@ -18,7 +16,9 @@ export const routingSlice = createSlice({
         targetPosition: [49, 9],
         instruction: null,
         routingActive: false,
-        following: false
+        following: false,
+        showLastPath: getItemFromStorage("showLastPath",true),
+        lastPath:[]
     },
     reducers: {
         setMapPosition: (state, action) => {
@@ -33,10 +33,11 @@ export const routingSlice = createSlice({
             state.currentPosition = action.payload
             const coordLat = state.currentPosition[0];
             const coordLon = state.currentPosition[1];
+            state.lastPath.unshift([coordLat,coordLon])
+            state.lastPath = state.lastPath.slice(0,200)
             const mapZom = localStorage.mapZoom;
             const pages = findWikiEntries(coordLat, coordLon, mapZom);
             const collections = pages;
-            console.log(collections);
         },
         setTargetPosition: () => {
             state.targetPosition = action.targetPosition
@@ -56,7 +57,11 @@ export const routingSlice = createSlice({
         },
         setFollowing: (state, action) => {
             state.following = action.payload
-        }
+        },
+        setShowLastPath: (state, action) => {
+            localStorage.setItem("showLastPath", JSON.stringify(action.payload));
+            state.showLastPath = action.payload
+        },
     }
 })
 
@@ -67,7 +72,8 @@ export const {
     setTargetPosition,
     setInstruction,
     setRoutingActive,
-    setFollowing
+    setFollowing,
+    setShowLastPath
 } = routingSlice.actions
 
 export default routingSlice.reducer

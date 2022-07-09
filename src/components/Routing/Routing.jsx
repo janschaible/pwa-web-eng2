@@ -30,6 +30,7 @@ const Routing = () => {
       map.removeControl(routingControl)
       setRoutingControl(null)
     }
+    dispatch(setInstruction(null))
     if(!routingActive || !targetPosition)return
 
     const control = L.Routing.control({

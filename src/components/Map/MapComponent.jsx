@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {Map} from './MapComponent.elements'
-import {TileLayer, useMapEvents} from 'react-leaflet'
+import {TileLayer,Polyline,Marker,useMapEvents}from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
 import {useDispatch, useSelector} from 'react-redux';
@@ -10,9 +10,10 @@ import {findWikiEntries} from "../../features/wikiPosts/wikiEntries";
 
 const EventHandeler = () => {
     const dispatch = useDispatch()
-    const [locatingError, setLocatingError] = useState(false)
-    const following = useSelector(state => state.routing.following)
-    const routingActive = useSelector(state => state.routing.routingActive)
+    const [locatingError,setLocatingError] = useState(false)
+    const [locationPoller,setLocationPoller] = useState()
+    const following = useSelector(state=>state.routing.following)
+    const routingActive = useSelector(state=>state.routing.routingActive)
     const mapPosition = useSelector(state => state.routing.mapPosition)
     const mapZoom = useSelector(state => state.routing.mapZoom)
 
@@ -30,51 +31,60 @@ const EventHandeler = () => {
         }
     });
 
-    const updateLocation = useCallback(() => {
-        window.navigator.geolocation.getCurrentPosition(position => {
+    const updateLocation =  useCallback(()=>{
+        
+    },[])
+
+    const stopLocationPolling = useCallback(()=>{
+        if(locationPoller){
+            clearInterval(locationPoller)
+        }
+    },[locationPoller])
+
+    useEffect(()=>{
+        //fly to users location on startup
+        window.navigator.geolocation.getCurrentPosition(position=>{
             const lat = position.coords.latitude
             const long = position.coords.longitude
-            dispatch(setCurrentPosition([lat, long]))
-            if (following) {
-                //sets the map position
-                dispatch(setMapPosition([lat, long]))
-            }
-            setLocatingError(false)
-        }, () => setLocatingError(true))
-    }, [])
+            map.flyTo([lat,long],map.getZoom())
+            dispatch(setCurrentPosition([lat,long]))
+            dispatch(setMapPosition([lat,long]))
+        }, ()=>setLocatingError(true))
+    },[])
 
-    useEffect(() => {
-        updateLocation() //sets the current location on startup
-    }, [])
-
-    //Creates Marker at locations returned from wikiAPI-call
-    //Currently works only when debugging and setting a breakpoint before for-loop (Line 56)
-    useEffect(() => {
-        const getMarkers = async ()=>{
-            const wikiCollection = await findWikiEntries(mapPosition[0], mapPosition[1], mapZoom)
-            console.log(wikiCollection)
-            for (let i = 0; i < wikiCollection.length; i++) {
-                const marker = L.marker([wikiCollection[i].lat, wikiCollection[i].lon], {title: wikiCollection[i].title}).addTo(map)
-            }    
+    useEffect(()=>{
+        if(!routingActive){
+            stopLocationPolling()
+            return
         }
-        getMarkers()
-    }, [mapPosition])
-
-    useEffect(() => {
-        if (!routingActive) return
-        //fly on load to lcation of user
-        window.navigator.geolocation.getCurrentPosition(position => {
-            map.flyTo([position.coords.latitude, position.coords.longitude], map.getZoom())
-        })
+        //fly on load to lcation of user on navigation start
+        window.navigator.geolocation.getCurrentPosition(position=>{
+            const lat = position.coords.latitude
+            const long = position.coords.longitude
+            map.flyTo([lat,long],map.getZoom())
+            dispatch(setCurrentPosition([lat,long]))
+        }, ()=>setLocatingError(true))
 
         //start location polling
-        const locationGetter = setInterval(updateLocation, 3000)
-        return () => clearInterval(locationGetter)
-    }, [routingActive])
+        const locationGetter = setInterval(()=>{
+            window.navigator.geolocation.getCurrentPosition(position=>{
+                const lat = position.coords.latitude
+                const long = position.coords.longitude
+                if(following){
+                    map.flyTo([lat,long],map.getZoom())
+                    dispatch(setMapPosition([lat,long]))
+                }
+                dispatch(setCurrentPosition([lat,long]))
+                setLocatingError(false)
+            }, ()=>setLocatingError(true))
+        },3000)
+        setLocationPoller(locationGetter)
+        return ()=>clearInterval(locationGetter)
+    },[routingActive])
 
-//alert user if we cannot get their location
-    useEffect(() => {
-        if (locatingError) {
+    //alert user if we cannot get their location
+    useEffect(()=>{
+        if(locatingError){clearInterval(locationGetter)
             f7.dialog.alert("Leider konnten wir ihre position nicht feststellen")
         }
     }, [locatingError])
@@ -82,9 +92,12 @@ const EventHandeler = () => {
     return <></>
 }
 
-const MapComponent = () => {
-    const position = useSelector(state => state.routing.mapPosition)
-    const zoom = useSelector(state => state.routing.mapZoom)
+const MapComponent = ()=>{
+    const [wikiEntries, setWikiEntries] = useState()
+    const mapPosition = useSelector(state=>state.routing.mapPosition)
+    const mapZoom = useSelector(state=>state.routing.mapZoom)
+    const showLastPath = useSelector(state=>state.routing.showLastPath)
+    const lastPath = useSelector(state=>state.routing.lastPath)
 
     const [mapRef, setMapRef] = useState(null)
     const mapRefCallback = useCallback(ref => {
@@ -95,14 +108,36 @@ const MapComponent = () => {
         if (mapRef == null) {
             return
         }
-        mapRef.setView(position, zoom)
-    }, [mapRef, position, zoom])
+        mapRef.setView(mapPosition, mapZoom)
+    }, [mapRef, mapPosition, mapZoom])
+
+    const getLastPathPoly = useCallback(()=>{
+        if (!showLastPath) return
+        return <Polyline 
+            pathOptions={{
+                color: 'black',
+                weight: 6,
+                opacity: 0.9
+            }}
+            positions={lastPath}
+        />
+    },[showLastPath,lastPath])
+
+    //Creates Marker at locations returned from wikiAPI-call
+    useEffect(()=>{
+        const getMarkers = async () => {
+            const wikiCollection = await findWikiEntries(mapPosition[0], mapPosition[1], mapZoom)
+            setWikiEntries(wikiCollection)
+        }        
+        getMarkers()
+    }, [mapPosition,mapZoom])
+    
 
     return (
         <Map
             ref={mapRefCallback}
-            center={position}
-            zoom={zoom}
+            center={mapPosition}
+            zoom={mapZoom}
             attributionControl={false}
             zoomControl={false}
             maxBounds={[
@@ -117,6 +152,14 @@ const MapComponent = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            {getLastPathPoly()}
+            {wikiEntries ? wikiEntries.map(entrie=>{
+                return <Marker 
+                    key={entrie.pageid} 
+                    position={[entrie.lat, entrie.lon]} 
+                    title={entrie.title}
+                />
+            }):<></>}
             <Routing/>
             <EventHandeler/>
         </Map>
