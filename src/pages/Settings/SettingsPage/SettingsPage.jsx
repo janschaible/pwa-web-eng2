@@ -1,5 +1,6 @@
 import { Page,ListItem,Toggle } from 'framework7-react';
-import { BackButton,Container,Anon,ItemList } from './SettingsPage.elements';
+import { BackButton,Container,ItemList } from '/pages/Settings/Settings.elements'
+import { Anon } from './SettingsPage.elements';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft,faUser } from '@fortawesome/free-solid-svg-icons'
 import { setShowLastPath } from '@/features/routing/routingSlice'
@@ -21,6 +22,9 @@ const SettingsPage = ()=>{
                     <ListItem>
                         <span>Letzte Wege anzeigen</span>
                         <Toggle onChange={e=>dispatch(setShowLastPath(!showLastPath))} checked={showLastPath}/>
+                    </ListItem>
+                    <ListItem link="/settings/recent-destinations/">
+                        Zuletzt besuchte Ziele
                     </ListItem>
                 </ItemList>
             </Container>
