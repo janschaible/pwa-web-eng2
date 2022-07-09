@@ -20,6 +20,7 @@ const Routing = () => {
     try{  
       routingControl.spliceWaypoints(0, 1, L.latLng(cp[0],cp[1]));
     }catch (e){
+      console.log("error adjusting current position")
       dispatch(setRoutingActive(false))
       return;
     }
@@ -65,8 +66,9 @@ const Routing = () => {
     if(!map)returncreateSlice
 
     try{
-      control.createAlternativesContainer().addTo(map)
+      control.addTo(map)
     }catch (e){
+      console.log("error adding control to map stopping navigation")
       dispatch(setRoutingActive(false))
       return;
     }
