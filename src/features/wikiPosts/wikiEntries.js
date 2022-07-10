@@ -26,7 +26,7 @@ export async function findWikiEntries(lat, lon, mapZoom) {
     gslimit: maxfinds,
     format: "json"
   }
-    ;
+
   url = url + "?origin=*";
   Object.keys(params).forEach(function (key) { url += "&" + key + "=" + params[key]; });
   try{
