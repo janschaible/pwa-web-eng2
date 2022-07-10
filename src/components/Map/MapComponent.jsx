@@ -66,7 +66,6 @@ const EventHandeler = () => {
             if(!routingActive){
                 return //check again because of delay
             }
-            console.log("routing active",routingActive)
             const lat = position.coords.latitude
             const long = position.coords.longitude
             map.flyTo([lat,long],map.getZoom())

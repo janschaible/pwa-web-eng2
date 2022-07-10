@@ -14,6 +14,7 @@ const Routing = () => {
   const targetPosition = useSelector(state=>state.routing.targetPosition)
   const routingActive = useSelector(state=>state.routing.routingActive)
   const [routingControl,setRoutingControl] = useState()
+  const [isRouting, setIsRouting] = useState()
 
   const spliceWaypoints = useCallback((cp)=>{
     if(!routingControl||!map)return
@@ -27,17 +28,13 @@ const Routing = () => {
   },[routingControl,map])
 
   useEffect(()=>{
+      if(!routingActive)return;
       spliceWaypoints(currentPosition)
   },[currentPosition])
 
   const initializeRouting = useCallback(()=>{
-    if (!map) return;
-    if(routingControl){
-      map.removeControl(routingControl)
-      setRoutingControl(null)
-    }
-    dispatch(setInstruction(null))
-    if(!routingActive || !targetPosition)return
+    if (!map || !routingActive || !targetPosition || !currentPosition) return;
+    setIsRouting(true)
 
     const control = L.Routing.control({
       waypoints: [
@@ -83,16 +80,21 @@ const Routing = () => {
     });
 
     setRoutingControl(control)
-    return ()=> {
-      if(!map)return;
-      map.removeControl(control)
-      setRoutingControl(null)
-    }
   },[map,targetPosition,currentPosition,routingActive])
 
   useEffect(() => {
-    return initializeRouting()
-  }, [map,routingActive])
+    if(routingActive && !isRouting){
+      dispatch(setInstruction(null))
+      return initializeRouting()
+    }else if(!routingActive) {
+      setIsRouting(false)
+      dispatch(setInstruction(null))
+      if(routingControl){
+        map.removeControl(routingControl)
+        setRoutingControl(null)
+      }
+    }
+  }, [routingActive,currentPosition])
 
   return null
 }
