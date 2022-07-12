@@ -60,4 +60,12 @@ export const SheetControlButton = styled(Button)`
     left: 0;
     right: 0;
 `
+
+export const FavoritesButton = styled(Button)`
+    position: absolute;
+    width: 5%;
+    bottom: 5.5rem;
+    right: 5%;
+    background-color: "blue";
+`
 //${props=>props.visible?"translate(0)":"translate(0, calc(1.5rem+100%))"}

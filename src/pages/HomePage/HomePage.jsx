@@ -14,7 +14,8 @@ import {
     DetailSheet, 
     SheetControlButton,
     Overlay,
-    SettingsButton
+    SettingsButton,
+    FavoritesButton
 } from "./HomePage.elements";
 
 import {useDispatch, useSelector} from "react-redux";
@@ -22,6 +23,7 @@ import {setRoutingActive} from '@/features/routing/routingSlice'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faList } from '@fortawesome/free-solid-svg-icons'
+import {getLocation} from "../../js/rev-geo";
 
 
 const HomePage = () => {
@@ -50,7 +52,7 @@ const HomePage = () => {
             <MapComponent/>
             <Overlay>
                     {instructionElement}
-                <SettingsButton href="/settings">
+                <SettingsButton href="/settings" sheetClose={true}>
                     <FontAwesomeIcon icon={faList} />
                 </SettingsButton>
             </Overlay>
@@ -76,6 +78,11 @@ const HomePage = () => {
                         <h2 style={{marginLeft: "100px"}}>Destination City</h2>
                     </div>
                 </div>
+                <FavoritesButton
+                large fill round
+                iconF7="star"
+                >
+                </FavoritesButton>
                 <NavigateButton
                     large fill round
                     onClick={navigate}
@@ -109,6 +116,11 @@ const HomePage = () => {
                         <h2 style={{marginLeft: "100px"}}>Destination Housenumber</h2>
                     </div>
                 </div>
+                <FavoritesButton
+                    large fill round
+                    iconF7="star"
+                >
+                </FavoritesButton>
                 <NavigateButton
                     large fill round
                     onClick={navigate}
