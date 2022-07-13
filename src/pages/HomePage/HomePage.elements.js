@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import {Link,Button, Sheet} from 'framework7-react';
+import { Link, Button, Sheet, Searchbar } from 'framework7-react';
 
 export const Overlay = styled.div`
   position: absolute;
@@ -36,7 +36,7 @@ export const NavigateButton = styled(Button)`
     padding: 2rem;
     z-index: 1000;
     font-size: 3vw;
-    background-color: ${props=>props.routingActive?"red":"blue"};
+    background-color: ${props => props.routingActive ? "red" : "blue"};
     transition: 2s ease-in-out;
 `
 
@@ -60,4 +60,16 @@ export const SheetControlButton = styled(Button)`
     left: 0;
     right: 0;
 `
+export const SearchbarField = styled(Searchbar)`
+    margin: calc(var(--f7-card-margin-horizontal) + var(--f7-safe-area-right));
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    border-style: none;
+    box-shadow: 2px 2px 1px black;
+    background-color: #EEE;
+
+`
+
+
 //${props=>props.visible?"translate(0)":"translate(0, calc(1.5rem+100%))"}
