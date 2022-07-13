@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {
     Page,
@@ -10,8 +10,8 @@ import 'framework7-icons';
 import MapComponent from '/components/Map/MapComponent'
 import {
     NavigateButton,
-    NavigateSheet, 
-    DetailSheet, 
+    NavigateSheet,
+    DetailSheet,
     SheetControlButton,
     Overlay,
     SettingsButton,
@@ -21,8 +21,8 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {setRoutingActive} from '@/features/routing/routingSlice'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faList } from '@fortawesome/free-solid-svg-icons'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faList} from '@fortawesome/free-solid-svg-icons'
 import {getLocation} from "../../js/rev-geo";
 
 
@@ -30,30 +30,71 @@ const HomePage = () => {
     const dispatch = useDispatch()
     const routingActive = useSelector(state => state.routing.routingActive)
     const currentPosition = useSelector(state => state.routing.currentPosition)
-    
+    const targetPosition = useSelector(state => state.routing.targetPosition)
+    const [currentCountry, setCurrentCountry] = useState()
+    const [currentState, setCurrentState] = useState()
+    const [currentCity, setCurrentCity] = useState()
+    const [currentStreet, setCurrentStreet] = useState()
+    const [currentHousenumber, setCurrentHousenumber] = useState()
+    const [targetCountry, setTargetCountry] = useState()
+    const [targetState, setTargetState] = useState()
+    const [targetCity, setTargetCity] = useState()
+    const [targetStreet, setTargetStreet] = useState()
+    const [targetHousenumber, setTargetHousenumber] = useState()
+
+    useEffect(() => {
+        if (currentPosition != null) {
+            const getLocationString = async () => {
+                const location = await getLocation(currentPosition[0], currentPosition[1])
+                const locationArray = location.split("\n")
+                setCurrentCountry(locationArray[0])
+                setCurrentState(locationArray[1])
+                setCurrentCity(locationArray[2])
+                setCurrentStreet(locationArray[3])
+                setCurrentHousenumber(locationArray[4])
+            }
+            getLocationString()
+        }
+    }, [currentPosition])
+
+    useEffect(() => {
+        if (targetPosition != null) {
+            const getTargetString = async () => {
+                const target = await getLocation(currentPosition[0], currentPosition[1])
+                const targetArray = target.split("\n")
+                setTargetCountry(targetArray[0])
+                setTargetState(targetArray[1])
+                setTargetCity(targetArray[2])
+                setTargetStreet(targetArray[3])
+                setTargetHousenumber(targetArray[4])
+            }
+            getTargetString()
+        } else setTargetCountry("No Target selected")
+    }, [targetPosition])
+
     const navigate = useCallback(() => {
         dispatch(setRoutingActive(!routingActive))
     }, [routingActive])
 
     // Navigation instructions
-    const instruction = useSelector(state=>state.routing.instruction)
+    const instruction = useSelector(state => state.routing.instruction)
     let instructionElement = null
-    if(instruction){
-        instructionElement=
-        <Card>
-            <CardHeader>
-                {instruction.text}
-            </CardHeader>
-        </Card>
+    if (instruction) {
+        instructionElement =
+            <Card>
+                <CardHeader>
+                    {instruction.text}
+                </CardHeader>
+            </Card>
     }
 
     return (
         <Page name="home">
             <MapComponent/>
             <Overlay>
-                    {instructionElement}
+                {instructionElement}
                 <SettingsButton href="/settings" sheetClose={true}>
-                    <FontAwesomeIcon icon={faList} />
+                    <FontAwesomeIcon icon={faList}/>
                 </SettingsButton>
             </Overlay>
             {/*To-DO: CSS-styling for Sheets especially concerning responsiveness (ask other Team-Members
@@ -70,17 +111,17 @@ const HomePage = () => {
                 </SheetControlButton>
                 <div style={{display: "flex", flex: "row"}}>
                     <div>
-                        <h1 style={{marginLeft: "50px"}}>Current Country</h1>
-                        <h2 style={{marginLeft: "50px"}}>Current City</h2>
+                        <h1 style={{marginLeft: "50px"}}>{currentCountry}</h1>
+                        <h2 style={{marginLeft: "50px"}}>{currentCity}</h2>
                     </div>
                     <div>
-                        <h1 style={{marginLeft: "100px"}}>Destination Country</h1>
-                        <h2 style={{marginLeft: "100px"}}>Destination City</h2>
+                        <h1 style={{marginLeft: "100px"}}>{targetCountry}</h1>
+                        <h2 style={{marginLeft: "100px"}}>{targetCity}</h2>
                     </div>
                 </div>
                 <FavoritesButton
-                large fill round
-                iconF7="star"
+                    large fill round
+                    iconF7="star"
                 >
                 </FavoritesButton>
                 <NavigateButton
@@ -104,16 +145,16 @@ const HomePage = () => {
                 </SheetControlButton>
                 <div style={{display: "flex", flex: "row"}}>
                     <div>
-                        <h1 style={{marginLeft: "50px"}}>Current Country</h1>
-                        <h2 style={{marginLeft: "50px"}}>Current City</h2>
-                        <h2 style={{marginLeft: "50px"}}>Current Street</h2>
-                        <h2 style={{marginLeft: "50px"}}>Current Housenumber</h2>
+                        <h1 style={{marginLeft: "50px"}}>{currentCountry}</h1>
+                        <h2 style={{marginLeft: "50px"}}>{currentState}</h2>
+                        <h2 style={{marginLeft: "50px"}}>{currentCity}</h2>
+                        <h2 style={{marginLeft: "50px"}}>{currentStreet} {currentHousenumber}</h2>
                     </div>
                     <div>
-                        <h1 style={{marginLeft: "100px"}}>Destination Country</h1>
-                        <h2 style={{marginLeft: "100px"}}>Destination City</h2>
-                        <h2 style={{marginLeft: "100px"}}>Destination Street</h2>
-                        <h2 style={{marginLeft: "100px"}}>Destination Housenumber</h2>
+                        <h1 style={{marginLeft: "100px"}}>{targetCountry}</h1>
+                        <h2 style={{marginLeft: "100px"}}>{targetState}</h2>
+                        <h2 style={{marginLeft: "100px"}}>{targetCity}</h2>
+                        <h2 style={{marginLeft: "100px"}}>{targetStreet} {targetHousenumber}</h2>
                     </div>
                 </div>
                 <FavoritesButton
