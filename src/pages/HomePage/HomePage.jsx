@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 
 import {
     Page,
@@ -21,12 +21,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { setRoutingActive } from '@/features/routing/routingSlice'
 
-import { findWikiEntries, findWikiEntriesByTitle } from '@/features/wikiPosts/wikiEntries'
+import { findWikiEntriesByTitle } from '@/features/wikiPosts/wikiEntries'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faList } from '@fortawesome/free-solid-svg-icons'
-import { Marker } from 'react-leaflet';
-import { useEffect } from 'react';
 
 
 const HomePage = () => {
@@ -51,34 +49,24 @@ const HomePage = () => {
                 </CardHeader>
             </Card>
     }
-    // useEffect(() => {
-    //     const getMarkers = async () => {
-    //         const wikiCollection = await findWikiEntries(mapPosition[0], mapPosition[1], mapZoom)
-    //         setWikiEntries(wikiCollection)
-    //     }
-    //     getMarkers()
-    // }, [mapPosition, mapZoom])
     let search = ''
     let searchPrint = ''
     return (
         <Page name="home">
-            <MapComponent searchPrint={searchPrint} searchingActive={onSubmit}/>
+            <MapComponent searchPrint={searchPrint} searchingActive={onSubmit} />
             <Overlay>
                 <SearchbarField
-                    //ref={inputRef}
                     init={true}
                     inline={true}
                     placeholder={"Suche deinen Weg"}
                     onInput={(e) => {
                         search = e.target.value
-                        //findWikiEntries(currentPosition[0],currentPosition[1],search, mapZoom)
                     }}
                     onSubmit={async (e) => {
                         e.preventDefault()
-                        // const coll = findWikiEntries(currentPosition[0], currentPosition[1], mapZoom)
                         searchPrint = findWikiEntriesByTitle(search)
                         onSubmit = true
-                        //console.log(searchPrint)
+                        console.log(searchPrint)
                     }}
                     onClickDisable={true}
                     disableButton={false}

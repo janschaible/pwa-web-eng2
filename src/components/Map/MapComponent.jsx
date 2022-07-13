@@ -11,7 +11,7 @@ import {
     setStartUp,
     setTargetPosition
 } from '@/features/routing/routingSlice'
-import { f7, Searchbar } from 'framework7-react';
+import { f7 } from 'framework7-react';
 import { findWikiEntries } from "../../features/wikiPosts/wikiEntries";
 
 const EventHandeler = () => {
@@ -109,16 +109,13 @@ const EventHandeler = () => {
 
 const MapComponent = (searchparams, searchingActive) => {
     const [searchPrint, setSearchPrint] = useState()
-    //const [onSubmit] = [onSearch]
     const [wikiEntries, setWikiEntries] = useState()
-    //console.log(searchPrint)
     const dispatch = useDispatch()
     const routingActive = useSelector(state => state.routing.routingActive)
     const mapPosition = useSelector(state => state.routing.mapPosition)
     const mapZoom = useSelector(state => state.routing.mapZoom)
     const showLastPath = useSelector(state => state.routing.showLastPath)
     const lastPath = useSelector(state => state.routing.lastPath)
-    //const searchingActive = useSelector(state => state.routing.searchingActive)
 
     const getLastPathPoly = useCallback(() => {
         if (!showLastPath) return
@@ -131,13 +128,6 @@ const MapComponent = (searchparams, searchingActive) => {
             positions={lastPath}
         />
     }, [showLastPath, lastPath])
-    // const getSearchedPosition = useCallback(() => {
-    //     if (onSubmit) return
-    //     return <Marker
-    //         position={[entrie.lat, entrie.lon]}
-    //         eventHandlers={getMarkerOnClick(entrie)}
-    //     />
-    // }, [onSubmit])
 
     //Creates Marker at locations returned from wikiAPI-call
     useEffect(() => {

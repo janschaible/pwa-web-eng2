@@ -66,7 +66,7 @@ export const SearchbarField = styled(Searchbar)`
     left: 0;
     border-radius: 50%;
     border-style: none;
-    box-shadow: 2px 2px 1px black;
+    box-shadow: 1px 1px 1px black;
     background-color: #EEE;
 
 `

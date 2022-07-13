@@ -10,15 +10,14 @@ export async function findWikiEntries(lat, lon, mapZoom) {
   } else {
     gsradius = 4500;
     maxfinds = mapZoom * 12;
-    //console.log(mapZoom);
   }
   var url = "https://en.wikipedia.org/w/api.php";
   var params = {
     action: "query",
     list: "geosearch",
     gscoord: "" + lat + "|" + lon + "",
-    //gscoord: "52.5208|13.4094",
-    gsradius: gsradius,  //Radius, in Meter
+    //gscoord: "52.5208|13.4094",    Example Data
+    gsradius: gsradius, 
     gslimit: maxfinds,
     format: "json"
   }
@@ -55,7 +54,7 @@ export async function findWikiEntriesByTitle(title) {
     const response = await fetch(url)
     const marsheledResponse = await response.json()
     const pages = marsheledResponse.query;
-    //console.groupCollapsed(pages)
+    //console.groupCollapsed(pages)           Logs the entire response of SearchBar entrie
     for (var place in pages) {
       collection.push(pages[place]);
     }
