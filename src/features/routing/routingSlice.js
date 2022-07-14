@@ -57,7 +57,7 @@ export const routingSlice = createSlice({
                 if(!state.routingActive){
                     let deleteID = -1;
                     for(let i=0;i<state.lastTargets.length;i++){
-                        if(state.lastTargets[i].pageid == state.targetPosition.pageid){
+                        if(state.lastTargets[i] && state.lastTargets[i].pageid == state.targetPosition.pageid){
                             deleteID = i
                             break
                         }

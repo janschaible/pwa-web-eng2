@@ -11,6 +11,17 @@ const BUILD_DIR = path.resolve(__dirname, './www',);
 export default {
   plugins: [
     react(),
+    {
+      name: "configure-response-headers",
+      configureServer: (server) => {
+        server.middlewares.use((_req, res, next) => {
+          res.setHeader("Access-Control-Allow-Origin", "*");
+          res.setHeader("Access-Control-Allow-Headers", "*");
+          res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+          next();
+        });
+      },
+    },
   ],
   root: SRC_DIR,
   base: '',
@@ -29,7 +40,7 @@ export default {
     },
   },
   server: {
-    host: true,
+    host: true
   },
   define: {
     'process.env': process.env
