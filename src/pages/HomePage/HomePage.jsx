@@ -14,19 +14,15 @@ import {
     DetailSheet,
     SheetControlButton,
     Overlay,
-    SettingsButton,
-    SearchbarField
+    SettingsButton
 } from "./HomePage.elements";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setRoutingActive } from '@/features/routing/routingSlice'
-
-import { findWikiEntriesByTitle } from '@/features/wikiPosts/wikiEntries'
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faList } from '@fortawesome/free-solid-svg-icons'
 
-
+export var onsubmit
 const HomePage = () => {
     const dispatch = useDispatch()
     const routingActive = useSelector(state => state.routing.routingActive)
@@ -40,7 +36,6 @@ const HomePage = () => {
     // Navigation instructions
     const instruction = useSelector(state => state.routing.instruction)
     let instructionElement = null
-    let onSubmit = true
     if (instruction) {
         instructionElement =
             <Card>
@@ -49,29 +44,10 @@ const HomePage = () => {
                 </CardHeader>
             </Card>
     }
-    let search = ''
-    let searchPrint = ''
     return (
         <Page name="home">
-            <MapComponent searchPrint={searchPrint} searchingActive={onSubmit} />
+            <MapComponent />
             <Overlay>
-                <SearchbarField
-                    init={true}
-                    inline={true}
-                    placeholder={"Suche deinen Weg"}
-                    onInput={(e) => {
-                        search = e.target.value
-                    }}
-                    onSubmit={async (e) => {
-                        e.preventDefault()
-                        searchPrint = findWikiEntriesByTitle(search)
-                        onSubmit = true
-                        console.log(searchPrint)
-                    }}
-                    onClickDisable={true}
-                    disableButton={false}
-                >
-                </SearchbarField>
                 {instructionElement}
                 <SettingsButton href="/settings">
                     <FontAwesomeIcon icon={faList} />

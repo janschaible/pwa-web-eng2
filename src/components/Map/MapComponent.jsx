@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Map } from './MapComponent.elements'
-import { TileLayer, Polyline, Marker, useMapEvents } from 'react-leaflet'
+import { TileLayer, Polyline, Marker, useMapEvents, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,9 +12,14 @@ import {
     setTargetPosition
 } from '@/features/routing/routingSlice'
 import { f7 } from 'framework7-react';
-import { findWikiEntries } from "../../features/wikiPosts/wikiEntries";
+import { findWikiEntries, findWikiEntriesByTitle, findWikiPageId } from "../../features/wikiPosts/wikiEntries";
+import { onsubmit } from '../../pages/HomePage/HomePage';
+import { SearchbarField } from '../Map/MapComponent.elements';
+import { value } from 'dom7';
+import { map } from 'leaflet';
+import { setFollowing } from '../../features/routing/routingSlice';
 
-const EventHandeler = () => {
+const EventHandeler = (param) => {
     const dispatch = useDispatch()
     const [locatingError, setLocatingError] = useState(false)
     const [locationPoller, setLocationPoller] = useState()
@@ -23,8 +28,7 @@ const EventHandeler = () => {
     const following = useSelector(state => state.routing.following)
     const routingActive = useSelector(state => state.routing.routingActive)
     const targetPosition = useSelector(state => state.routing.targetPosition)
-    const searchedPosition = useSelector(state => state.routing.searchedPosition)
-
+    const searchingActive = useSelector(state => state.routing.searchingActive)
     const map = useMapEvents({
         zoomend: () => {
             //zoom in on mouse position changes position of map
@@ -56,6 +60,11 @@ const EventHandeler = () => {
         }, () => setLocatingError(true))
     }, [startUp])
 
+    useEffect(() => {
+        if (searchingActive) {
+            map.flyTo([targetPosition.lat, targetPosition.lon], 10)
+        }
+    }, [searchingActive])
     //map position update when navigating
     useEffect(() => {
         if (!routingActive) {
@@ -72,7 +81,8 @@ const EventHandeler = () => {
             map.flyTo([lat, long], map.getZoom())
             dispatch(setCurrentPosition([lat, long]))
         }, () => setLocatingError(true))
-
+        //fly to result of Searchbar-search
+        // window.navigator.geolocation.getCurrentPosition(position => {
         //start location polling
         const locationGetter = setInterval(() => {
             window.navigator.geolocation.getCurrentPosition(position => {
@@ -91,13 +101,11 @@ const EventHandeler = () => {
         setLocationPoller(locationGetter)
         return () => clearInterval(locationGetter)
     }, [routingActive])
-
     //fly to target position when that changes
     useEffect(() => {
         if (!targetPosition) return
         map.flyTo([targetPosition.lat, targetPosition.lon], map.getZoom())
     }, [targetPosition])
-
     //alert user if we cannot get their location
     useEffect(() => {
         if (locatingError) {
@@ -107,8 +115,8 @@ const EventHandeler = () => {
     }, [locatingError])
 }
 
-const MapComponent = (searchparams, searchingActive) => {
-    const [searchPrint, setSearchPrint] = useState()
+const MapComponent = () => {
+    const [searchingActive, setSearchingActive] = useState(true)
     const [wikiEntries, setWikiEntries] = useState()
     const dispatch = useDispatch()
     const routingActive = useSelector(state => state.routing.routingActive)
@@ -116,7 +124,6 @@ const MapComponent = (searchparams, searchingActive) => {
     const mapZoom = useSelector(state => state.routing.mapZoom)
     const showLastPath = useSelector(state => state.routing.showLastPath)
     const lastPath = useSelector(state => state.routing.lastPath)
-
     const getLastPathPoly = useCallback(() => {
         if (!showLastPath) return
         return <Polyline
@@ -128,7 +135,6 @@ const MapComponent = (searchparams, searchingActive) => {
             positions={lastPath}
         />
     }, [showLastPath, lastPath])
-
     //Creates Marker at locations returned from wikiAPI-call
     useEffect(() => {
         const getMarkers = async () => {
@@ -137,15 +143,21 @@ const MapComponent = (searchparams, searchingActive) => {
         }
         getMarkers()
     }, [mapPosition, mapZoom])
-
     const getMarkerOnClick = useCallback(
         (entrie) => ({
             click: () => {
                 dispatch(setTargetPosition(entrie))
             },
         }), [])
-
-    //the map center is only set once on initialization
+    let search = ''
+    const [c1, setC1] = useState(0)
+    const [c2, setC2] = useState(0)
+    let searchPrint = ''
+    var c = 0
+    let b = ['']
+    var d = 0
+    var j = 0
+    var finalPosition = []
     return (
         <Map
             center={mapPosition}
@@ -164,6 +176,44 @@ const MapComponent = (searchparams, searchingActive) => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            <SearchbarField
+                init={true}
+                inline={true}
+                placeholder={"Suche deinen Weg"}
+                onInput={async (e) => {
+                    search = e.target.value
+                    searchPrint = search
+                }}
+                onSubmit={async (e) => {
+                    e.preventDefault()
+                    var mapPos = [0, 0]
+                    searchPrint = await findWikiEntriesByTitle(search).then((value) => {
+                        b = value[0]
+                        for (let [key] of Object.entries(b)) {
+                            c = key
+                        }
+                        finalPosition = b[c]["coordinates"]
+                        d = finalPosition[0]["lat"]
+                        j = finalPosition[0]["lon"]
+                        setC1(d)
+                        setC2(j)
+                        setSearchingActive(false)
+                        var mapPos = [c1, c2]
+                        //setMapPosition(mapPos)
+                        //console.log(mapPos)
+                    });
+                    setMapPosition(mapPos)
+                    console.log(mapPosition)
+                }
+                }
+                onClickDisable={true}
+                disableButton={false}
+                onClickClear={() => {
+                    setSearchingActive(true)
+                }}
+                backdropEl={false}
+            />
+            {!searchingActive ? <Marker position={[c1, c2]} >Hallo</Marker> : <></>}
             {getLastPathPoly()}
             {wikiEntries && !routingActive ? wikiEntries.map(entrie => {
                 return (
@@ -175,20 +225,6 @@ const MapComponent = (searchparams, searchingActive) => {
                     />
                 )
             }) : <></>}
-            {searchPrint && searchingActive ? searchPrint.map(entrie => {
-                if (searchingActive) {
-                    setSearchPrint(searchPrint)
-                }
-                return (
-                    <Marker
-                        key={entrie.pageid}
-                        position={[entrie.lat, entrie.lon]}
-                        eventHandlers={getMarkerOnClick(entrie)}
-                        title={entrie.title}
-                    />
-                )
-            })
-                : <></>}
             <Routing />
             <EventHandeler />
         </Map>
