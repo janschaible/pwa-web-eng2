@@ -24,3 +24,9 @@ Framework7.use(Framework7React)
 // Mount React App
 const root = createRoot(document.getElementById('app'));
 root.render(React.createElement(App));
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register("/js/serviceWorker.js").then(function () {
+        console.log('Registration Successful');
+    });
+}
