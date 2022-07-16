@@ -37,11 +37,15 @@ export const routingSlice = createSlice({
         showLastPath: getItemFromStorage("showLastPath",true),
         //the lastPath travled by the user (recent currentLocations)
         lastPath:[],
+<<<<<<< HEAD
         tileLayer: getItemFromStorage("tileLayer",0)
         //a list of the last targets visited by the user
         lastTargets: getItemFromStorage("lastTargets",[]),
         //a list of the users favorite destinations
         favorites: getItemFromStorage("favorites",[])
+=======
+        lastTargets: getItemFromStorage("lastTargets",[])
+>>>>>>> parent of 1824c61 (adding changeable layers (#3))
     },
     reducers: {
         setStartUp: (state, action) => {
@@ -50,10 +54,6 @@ export const routingSlice = createSlice({
         setMapPosition: (state, action) => {
             localStorage.setItem("mapPosition", JSON.stringify(action.payload));
             state.mapPosition = action.payload;
-        },
-        setTileLayer: (state, action) => {
-            localStorage.setItem("tileLayer", JSON.stringify(action.payload));
-            state.tileLayer = action.payload;
         },
         setMapZoom: (state, action) => {
             state.mapZoom = action.payload
@@ -124,7 +124,6 @@ export const routingSlice = createSlice({
 export const {
     setStartUp,
     setMapPosition,
-    setTileLayer,
     setMapZoom,
     setCurrentPosition,
     setTargetPosition,

@@ -70,6 +70,7 @@ export const SheetControlButton = styled(Button)`
     right: 0;
 `
 
+<<<<<<< HEAD
 export const FavoritesButton = styled(Button)`
     position: absolute;
     width: 5%;
@@ -83,3 +84,8 @@ export const FavoritesButton = styled(Button)`
         return "blue"
       }};
 `
+=======
+
+
+//${props=>props.visible?"translate(0)":"translate(0, calc(1.5rem+100%))"}
+>>>>>>> parent of 1824c61 (adding changeable layers (#3))

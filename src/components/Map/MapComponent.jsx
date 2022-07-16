@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * This file contains the functionality for displaying the map
  * and hadeling events from the map and events that change the maps position or zoom
@@ -6,6 +7,11 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {Map} from './MapComponent.elements'
 import {TileLayer,Polyline,Marker,useMapEvents,Popup, WMSTileLayer } from 'react-leaflet'
+=======
+import React, { useCallback, useEffect, useState } from 'react'
+import { Map } from './MapComponent.elements'
+import { TileLayer, Polyline, Marker, useMapEvents, Popup } from 'react-leaflet'
+>>>>>>> parent of 1824c61 (adding changeable layers (#3))
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
 import {useDispatch, useSelector} from 'react-redux';
@@ -17,9 +23,14 @@ import {
     setStartUp,
     setTargetPosition
 } from '@/features/routing/routingSlice'
+<<<<<<< HEAD
 
 import {f7} from 'framework7-react';
 import {findWikiEntries, findWikiEntriesByTitle, findWikiPageId } from "@/features/wikiPosts/wikiEntries";
+=======
+import { f7 } from 'framework7-react';
+import { findWikiEntries, findWikiEntriesByTitle, findWikiPageId } from "../../features/wikiPosts/wikiEntries";
+>>>>>>> parent of 1824c61 (adding changeable layers (#3))
 import { onsubmit } from '../../pages/HomePage/HomePage';
 import { SearchbarField } from '../Map/MapComponent.elements';
 import { value } from 'dom7';
@@ -138,12 +149,16 @@ const EventHandeler = (param) => {
     }, [locatingError])
 }
 
+<<<<<<< HEAD
 /**
  *  MapComponent is the main Map container, which is why it contains the eventhandler
  *  and the routing component so that they have access to the map 
  */
 const MapComponent = ()=>{
     const tileLayer = useSelector(state=>state.routing.tileLayer)
+=======
+const MapComponent = () => {
+>>>>>>> parent of 1824c61 (adding changeable layers (#3))
     const [searchingActive, setSearchingActive] = useState(true)
     const [wikiEntries, setWikiEntries] = useState()
     const dispatch = useDispatch()
@@ -174,11 +189,16 @@ const MapComponent = ()=>{
             setWikiEntries(wikiCollection)
         }
         getMarkers()
+<<<<<<< HEAD
     }, [mapPosition,mapZoom])
 
     /**
      * returns a onclickfunction that sets the passed wiki entrie as the desired targes position
      */
+=======
+    }, [mapPosition, mapZoom])
+
+>>>>>>> parent of 1824c61 (adding changeable layers (#3))
     const getMarkerOnClick = useCallback(
         (entrie) => ({
             click: () => {
@@ -194,6 +214,7 @@ const MapComponent = ()=>{
     var d = 0
     var j = 0
     var finalPosition = []
+<<<<<<< HEAD
     const getLayer = useCallback(()=>{
         console.log(tileLayer)
         if(tileLayer == 0){
@@ -220,6 +241,8 @@ const MapComponent = ()=>{
      * the actual position of the map is set by setting a target position
      * the eventhandler will than fly to that position
      */
+=======
+>>>>>>> parent of 1824c61 (adding changeable layers (#3))
     return (
         <Map
             center={mapPosition}
@@ -233,44 +256,10 @@ const MapComponent = ()=>{
             maxBoundsViscosity={0.8}
             minZoom={3}
         >
-            {getLayer()}
-
-            <SearchbarField
-                init={true}
-                inline={true}
-                placeholder={"Suche deinen Weg"}
-                onInput={async (e) => {
-                    search = e.target.value
-                    searchPrint = search
-                }}
-                onSubmit={async (e) => {
-                    e.preventDefault()
-                    var mapPos = [0, 0]
-                    searchPrint = await findWikiEntriesByTitle(search).then((value) => {
-                        b = value[0]
-                        for (let [key] of Object.entries(b)) {
-                            c = key
-                        }
-                        finalPosition = b[c]["coordinates"]
-                        d = finalPosition[0]["lat"]
-                        j = finalPosition[0]["lon"]
-                        setC1(d)
-                        setC2(j)
-                        setSearchingActive(false)
-                        var mapPos = [c1, c2]
-                        //setMapPosition(mapPos)
-                        //console.log(mapPos)
-                    });
-                    setMapPosition(mapPos)
-                    console.log(mapPosition)
-                }
-                }
-                onClickDisable={true}
-                disableButton={false}
-                onClickClear={() => {
-                    setSearchingActive(true)
-                }}
-                backdropEl={false}
+            <TileLayer
+                noWrap={true}
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <SearchbarField
                 init={true}

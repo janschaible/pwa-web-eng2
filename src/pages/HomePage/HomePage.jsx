@@ -3,12 +3,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {
     Page,
     Card,
-    CardHeader,
-    FabBackdrop,
-    Fab,
-    Icon,
-    FabButtons,
-    FabButton,
+    CardHeader
 } from 'framework7-react';
 import 'framework7-icons';
 
@@ -19,6 +14,7 @@ import {
     DetailSheet,
     SheetControlButton,
     Overlay,
+<<<<<<< HEAD
     SettingsButton,
     FavoritesButton
 } from "./HomePage.elements";
@@ -34,6 +30,15 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faList} from '@fortawesome/free-solid-svg-icons'
 import {getLocation} from "../../js/rev-geo";
+=======
+    SettingsButton
+} from "./HomePage.elements";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setRoutingActive } from '@/features/routing/routingSlice'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faList } from '@fortawesome/free-solid-svg-icons'
+>>>>>>> parent of 1824c61 (adding changeable layers (#3))
 
 export var onsubmit
 const HomePage = () => {
@@ -87,11 +92,8 @@ const HomePage = () => {
     const navigate = useCallback(() => {
         dispatch(setRoutingActive(!routingActive))
     }, [routingActive])
-    
-    const selectBasic = useCallback(()=>{
-        dispatch(setTileLayer(0))
-    })
 
+<<<<<<< HEAD
     const selectLayer1 = useCallback(()=>{
         dispatch(setTileLayer(1))
     })
@@ -112,6 +114,8 @@ const HomePage = () => {
         const selectLayer2 = useCallback(()=>{
         dispatch(setTileLayer(2))
     })
+=======
+>>>>>>> parent of 1824c61 (adding changeable layers (#3))
     // Navigation instructions
     /**
      * onclick for the faforite button,
@@ -230,18 +234,6 @@ const HomePage = () => {
                     Navigieren
                 </NavigateButton>
             </DetailSheet>
-            <link rel="stylesheet" href="./css/buttons.css" />
-            <FabBackdrop slot="fixed"/>
-
-            <Fab id="layerFab" position="right-center" slot="fixed" border-radius="5%">
-                <Icon>Layer</Icon>
-                <Icon>Layer</Icon>
-                <FabButtons position="bottom">
-                    <FabButton id="fabButton1" onClick={selectBasic}></FabButton>
-                    <FabButton id="fabButton2" onClick={selectLayer1}></FabButton>
-                    <FabButton id="fabButton3" onClick={selectLayer2}></FabButton>
-                </FabButtons>
-            </Fab>
         </Page>
     );
 }
