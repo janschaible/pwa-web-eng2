@@ -37,14 +37,15 @@ export const NavigateButton = styled(Button)`
     z-index: 1000;
     font-size: 3vw;
     background-color: ${props=>{
-        if(!props.disabled){
-          if(props.routingActive){
+      console.log("navigate btn ", props.disabled)
+        if(props.disabled){
+          return "gray"          
+        }
+        if(props.routingActive){
             return "red"
           }else{
             return "blue"
           }
-        }
-        return "gray"
       }};
     transition: 2s ease-in-out;
 `
@@ -75,6 +76,12 @@ export const FavoritesButton = styled(Button)`
     width: 5%;
     bottom: 5.5rem;
     right: 5%;
-    background-color: "blue";
+    background-color: ${props=>{
+      console.log("fav button disabled",props.disabled)
+        if(props.disabled){
+          return "gray"
+        }
+        return "blue"
+      }};
 `
 //${props=>props.visible?"translate(0)":"translate(0, calc(1.5rem+100%))"}
