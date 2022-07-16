@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import {Link,Button, Sheet} from 'framework7-react';
+import { Link, Button, Sheet} from 'framework7-react';
 
 export const Overlay = styled.div`
   position: absolute;
