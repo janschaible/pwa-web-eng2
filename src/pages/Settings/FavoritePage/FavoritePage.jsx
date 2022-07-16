@@ -8,12 +8,23 @@ import { useCallback } from "react";
 import {f7} from 'framework7-react';
 
 
+/**
+ * Display all of the users favorite destinations
+ * when a destination from the list is selected the destination
+ * will be shown on the map
+ */
 const FavoritePage = ()=>{
     const dispatch = useDispatch()
     const favorites = useSelector(state=>state.routing.favorites)
     const routingActive = useSelector(state=>state.routing.routingActive)
 
-    const getSelectRecentCallback = useCallback((target)=>{
+    /**
+     * returns a onclick function for a passed favorite
+     * onclick will show a warning if the user wants to select a target
+     * if routing is currently active otherwise it will set the target position 
+     * to the passed favorite
+     */
+    const getOnclickListItem = useCallback((target)=>{
         return ()=>{
             if(routingActive){
                 f7.dialog.alert("Bitte beenden Sie zunächst die laufende Navigation")
@@ -35,16 +46,16 @@ const FavoritePage = ()=>{
                 <ItemList>
                     {
                         favorites && favorites.length!=0?
-                            favorites.map(faforite=>{
-                                if(!faforite)return
+                            favorites.map(favorite=>{
+                                if(!favorite)return
                                 return (
                                 <ListItem 
-                                    key={faforite.pageid} 
-                                    onClick={getSelectRecentCallback(faforite)}
+                                    key={favorite.pageid} 
+                                    onClick={getOnclickListItem(favorite)}
                                     style={{cursor:'pointer'}} 
                                     link={routingActive?"/settings/favorites":"/"}
                                 >
-                                    {faforite.title}
+                                    {favorite.title}
                                 </ListItem>
                             )})
                             :

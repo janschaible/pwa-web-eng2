@@ -81,6 +81,9 @@ const HomePage = () => {
         dispatch(setRoutingActive(!routingActive))
     }, [routingActive])
 
+    /**
+     * @return true if the currently selected targetlocation is a user faforite false if not
+     */
     const isTargetFavorite = useCallback(()=>{
         if (!favorites || !targetPosition)return false
         for(let favorite of favorites){
@@ -91,6 +94,10 @@ const HomePage = () => {
         return false
     },[targetPosition,favorites])
 
+    /**
+     * onclick for the faforite button,
+     * toggles the favorite state of the selected target
+     */
     const toggleFavorite = useCallback(()=>{
         if (!favorites || !targetPosition)return
         if(isTargetFavorite()){
@@ -100,7 +107,9 @@ const HomePage = () => {
         dispatch(addFavorite(targetPosition))
     },[targetPosition,favorites,isTargetFavorite])
 
-    // Navigation instructions
+    /**
+     * Navigation instructions
+     */
     const instruction = useSelector(state => state.routing.instruction)
     let instructionElement = null
     if (instruction) {

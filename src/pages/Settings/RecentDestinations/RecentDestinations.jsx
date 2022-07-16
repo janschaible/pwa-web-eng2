@@ -7,13 +7,23 @@ import { setTargetPosition } from '@/features/routing/routingSlice'
 import { useCallback } from "react";
 import {f7} from 'framework7-react';
 
-
+/**
+ * Display all of the users recent destinations
+ * when a destination from the list is selected the destination
+ * will be shown on the map
+ */
 const RecentDestinations = ()=>{
     const dispatch = useDispatch()
     const lastTargets = useSelector(state=>state.routing.lastTargets)
     const routingActive = useSelector(state=>state.routing.routingActive)
 
-    const getSelectRecentCallback = useCallback((target)=>{
+    /**
+     * returns a onclick function for a passed destination
+     * onclick will show a warning if the user wants to select a target
+     * if routing is currently active otherwise it will set the target position 
+     * to the passed destination
+     */
+    const getOnclickListItem = useCallback((target)=>{
         return ()=>{
             if(routingActive){
                 f7.dialog.alert("Bitte beenden Sie zunächst die laufende Navigation")
@@ -40,7 +50,7 @@ const RecentDestinations = ()=>{
                                 return (
                                 <ListItem 
                                     key={target.pageid} 
-                                    onClick={getSelectRecentCallback(target)}
+                                    onClick={getOnclickListItem(target)}
                                     style={{cursor:'pointer'}} 
                                     link={routingActive?"/settings/recent-destinations":"/"}
                                 >

@@ -1,3 +1,8 @@
+/**
+ * This file contains the functionality for displaying the map
+ * and hadeling events from the map and events that change the maps position or zoom
+ */
+
 import React, {useCallback, useEffect, useState} from 'react'
 import {Map} from './MapComponent.elements'
 import {TileLayer,Polyline,Marker,useMapEvents}from 'react-leaflet'
@@ -15,6 +20,10 @@ import {
 import {f7} from 'framework7-react';
 import {findWikiEntries} from "@/features/wikiPosts/wikiEntries";
 
+/**
+ * Component handles any event that requires access to the map
+ * furthermore it keeps the maps state with the app's state in sync
+ */
 const EventHandeler = () => {
     const dispatch = useDispatch()
     const [locatingError,setLocatingError] = useState(false)
@@ -25,6 +34,9 @@ const EventHandeler = () => {
     const routingActive = useSelector(state=>state.routing.routingActive)
     const targetPosition = useSelector(state=>state.routing.targetPosition)
 
+    /**
+     * update the position and zoom of the map into redux store
+     */
     const map = useMapEvents({
         zoomend: () => {
             //zoom in on mouse position changes position of map
@@ -44,6 +56,11 @@ const EventHandeler = () => {
         }
     },[locationPoller])
 
+    /**
+     * fly to the users position when the map is started
+     * has to be done with a variable from redux since there was some wired behaviour
+     * when switching back to the main page
+     */
     useEffect(()=>{
         if(!startUp)return
         dispatch(setStartUp(false))
@@ -56,7 +73,9 @@ const EventHandeler = () => {
         }, ()=>setLocatingError(true))
     },[startUp])
 
-    //map position update when navigating
+    /**
+     * starting the location polling and maintains the map on the user position
+     */
     useEffect(()=>{
         if(!routingActive){
             stopLocationPolling()
@@ -94,13 +113,17 @@ const EventHandeler = () => {
         return ()=>clearInterval(locationGetter)
     },[routingActive])
 
-    //fly to target position when that changes
+    /**
+     * fly to target position whenever that changes
+     */
     useEffect(()=>{
         if(!targetPosition)return
         map.flyTo([targetPosition.lat,targetPosition.lon],constants.mapFlyToZoom)
     },[targetPosition])
 
-    //alert user if we cannot get their location
+    /**
+     * alert user if we cannot get their location
+     */
     useEffect(()=>{
         if(locatingError){clearInterval(locationGetter)
             f7.dialog.alert("Leider konnten wir ihre position nicht feststellen")
@@ -110,6 +133,11 @@ const EventHandeler = () => {
     return <></>
 }
 
+
+/**
+ *  MapComponent is the main Map container, which is why it contains the eventhandler
+ *  and the routing component so that they have access to the map 
+ */
 const MapComponent = ()=>{
     const [wikiEntries, setWikiEntries] = useState()
     
@@ -120,6 +148,9 @@ const MapComponent = ()=>{
     const showLastPath = useSelector(state=>state.routing.showLastPath)
     const lastPath = useSelector(state=>state.routing.lastPath)
 
+    /**
+     * creates a polyline from the last taken path
+     */
     const getLastPathPoly = useCallback(()=>{
         if (!showLastPath) return
         return <Polyline 
@@ -141,6 +172,9 @@ const MapComponent = ()=>{
         getMarkers()
     }, [mapPosition,mapZoom])
 
+    /**
+     * returns a onclickfunction that sets the passed wiki entrie as the desired targes position
+     */
     const getMarkerOnClick = useCallback(
         (entrie) => ({
             click: ()=>{
@@ -148,7 +182,11 @@ const MapComponent = ()=>{
           },
         }),[])
 
-    //the map center is only set once on initialization
+    /**
+     * the map center is only set once on initialization
+     * the actual position of the map is set by setting a target position
+     * the eventhandler will than fly to that position
+     */
     return (
         <Map
             center={mapPosition}

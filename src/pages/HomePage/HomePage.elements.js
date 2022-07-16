@@ -83,4 +83,3 @@ export const FavoritesButton = styled(Button)`
         return "blue"
       }};
 `
-//${props=>props.visible?"translate(0)":"translate(0, calc(1.5rem+100%))"}
