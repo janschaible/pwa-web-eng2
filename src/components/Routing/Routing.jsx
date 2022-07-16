@@ -5,7 +5,7 @@ import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine";
 import { useMap } from "react-leaflet";
 import { useDispatch, useSelector } from "react-redux";
-import {setInstruction} from '@/features/routing/routingSlice'
+import {setInstruction,setRoutingActive} from '@/features/routing/routingSlice'
 
 const Routing = () => {
   const map = useMap()
@@ -14,28 +14,32 @@ const Routing = () => {
   const targetPosition = useSelector(state=>state.routing.targetPosition)
   const routingActive = useSelector(state=>state.routing.routingActive)
   const [routingControl,setRoutingControl] = useState()
+  const [isRouting, setIsRouting] = useState()
 
   const spliceWaypoints = useCallback((cp)=>{
-    if(!routingControl)return
-    routingControl.spliceWaypoints(0, 1, L.latLng(cp[0],cp[1]));
-  },[routingControl])
+    if(!routingControl||!map)return
+    try{  
+      routingControl.spliceWaypoints(0, 1, L.latLng(cp[0],cp[1]));
+    }catch (e){
+      console.log("error adjusting current position")
+      dispatch(setRoutingActive(false))
+      return;
+    }
+  },[routingControl,map])
 
   useEffect(()=>{
-    spliceWaypoints(currentPosition)
+      if(!routingActive)return;
+      spliceWaypoints(currentPosition)
   },[currentPosition])
 
   const initializeRouting = useCallback(()=>{
-    if (!map) return;
-    if(routingControl){
-      map.removeControl(routingControl)
-      setRoutingControl(null)
-    }
-    if(!routingActive || !targetPosition)return
+    if (!map || !routingActive || !targetPosition || !currentPosition) return;
+    setIsRouting(true)
 
     const control = L.Routing.control({
       waypoints: [
         L.latLng(currentPosition[0],currentPosition[1]), 
-        L.latLng(targetPosition[0], targetPosition[1])
+        L.latLng(targetPosition.lat, targetPosition.lon)
       ],
       lineOptions: {
         styles: [
@@ -55,8 +59,16 @@ const Routing = () => {
         language: 'de'
       }),
       show:false
-    }).addTo(map)
+    })
+    if(!map)returncreateSlice
 
+    try{
+      control.addTo(map)
+    }catch (e){
+      console.log("error adding control to map stopping navigation")
+      dispatch(setRoutingActive(false))
+      return;
+    }
     control._container.style.display = "None";//hide itinerary show:false did not remove container
 
     control.on('routeselected', function(e) {
@@ -68,15 +80,21 @@ const Routing = () => {
     });
 
     setRoutingControl(control)
-    return ()=> {
-      map.removeControl(control)
-      setRoutingControl(null)
-    }
   },[map,targetPosition,currentPosition,routingActive])
 
   useEffect(() => {
-    return initializeRouting()
-  }, [map,routingActive])
+    if(routingActive && !isRouting){
+      dispatch(setInstruction(null))
+      return initializeRouting()
+    }else if(!routingActive) {
+      setIsRouting(false)
+      dispatch(setInstruction(null))
+      if(routingControl){
+        map.removeControl(routingControl)
+        setRoutingControl(null)
+      }
+    }
+  }, [routingActive,currentPosition])
 
   return null
 }
