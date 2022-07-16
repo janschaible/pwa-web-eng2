@@ -8,7 +8,7 @@ import { useCallback } from "react";
 import {f7} from 'framework7-react';
 
 
-const RecentDestinations = ()=>{
+const FavoritePage = ()=>{
     const dispatch = useDispatch()
     const favorites = useSelector(state=>state.routing.favorites)
     const routingActive = useSelector(state=>state.routing.routingActive)
@@ -58,4 +58,4 @@ const RecentDestinations = ()=>{
     )
 }
 
-export default RecentDestinations
+export default FavoritePage
