@@ -20,7 +20,7 @@ export const routingSlice = createSlice({
         following: false,
         showLastPath: getItemFromStorage("showLastPath",true),
         lastPath:[],
-        tileLayer: getItemFromStorage("tileLayer",0)
+        tileLayer: getItemFromStorage("tileLayer",0),
         lastTargets: getItemFromStorage("lastTargets",[])
     },
     reducers: {
