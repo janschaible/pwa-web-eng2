@@ -129,6 +129,7 @@ const HomePage = () => {
                     onClick={navigate}
                     routingActive={routingActive}
                     visible={currentPosition != null}
+                    disabled={targetPosition==undefined}
                 >
                     Navigieren
                 </NavigateButton>

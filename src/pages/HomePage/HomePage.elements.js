@@ -36,7 +36,16 @@ export const NavigateButton = styled(Button)`
     padding: 2rem;
     z-index: 1000;
     font-size: 3vw;
-    background-color: ${props=>props.routingActive?"red":"blue"};
+    background-color: ${props=>{
+        if(!props.disabled){
+          if(props.routingActive){
+            return "red"
+          }else{
+            return "blue"
+          }
+        }
+        return "gray"
+      }};
     transition: 2s ease-in-out;
 `
 
