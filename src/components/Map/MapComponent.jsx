@@ -143,6 +143,7 @@ const MapComponent = () => {
         }
         getMarkers()
     }, [mapPosition, mapZoom])
+
     const getMarkerOnClick = useCallback(
         (entrie) => ({
             click: () => {
@@ -180,7 +181,7 @@ const MapComponent = () => {
                 init={true}
                 inline={true}
                 placeholder={"Suche deinen Weg"}
-                onInput={async (e) => {
+                onInput={(e) => {
                     search = e.target.value
                     searchPrint = search
                 }}
@@ -189,6 +190,7 @@ const MapComponent = () => {
                     var mapPos = [0, 0]
                     searchPrint = await findWikiEntriesByTitle(search).then((value) => {
                         b = value[0]
+                        console.log(value)
                         for (let [key] of Object.entries(b)) {
                             c = key
                         }
@@ -199,15 +201,23 @@ const MapComponent = () => {
                         setC2(j)
                         setSearchingActive(false)
                         var mapPos = [c1, c2]
+                        let wikiEntrie = {
+                            lat: d, 
+                            lon: j,
+                            ...b[c]
+                        }
+                        dispatch(setTargetPosition(wikiEntrie))
+                        //dispatch(setTargetPosition())
                         //setMapPosition(mapPos)
                         //console.log(mapPos)
+
                     });
-                    setMapPosition(mapPos)
-                    console.log(mapPosition)
+                    //console.log(mapPosition)
                 }
                 }
-                onClickDisable={true}
-                disableButton={false}
+                
+                disableButton={true}
+                disableButtonText={"cANCEL"}
                 onClickClear={() => {
                     setSearchingActive(true)
                 }}
