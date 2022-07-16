@@ -18,6 +18,9 @@ const SettingsPage = ()=>{
 
                 <PageIcon icon={faUser}/>
                 <ItemList>
+                    <ListItem link="/settings/favorites">
+                        Favoriten anzeigen
+                    </ListItem>
                     <ListItem>
                         <span>Letzte Wege anzeigen</span>
                         <Toggle onChange={e=>dispatch(setShowLastPath(!showLastPath))} checked={showLastPath}/>
