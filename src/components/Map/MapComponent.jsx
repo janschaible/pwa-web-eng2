@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Map } from './MapComponent.elements'
-import { TileLayer, Polyline, Marker, useMapEvents, Popup } from 'react-leaflet'
+
+import { TileLayer, Polyline, Marker, useMapEvents,Popup, WMSTileLayer } from 'react-leaflet'
+
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +15,7 @@ import {
 } from '@/features/routing/routingSlice'
 import { f7 } from 'framework7-react';
 import { findWikiEntries, findWikiEntriesByTitle, findWikiPageId } from "../../features/wikiPosts/wikiEntries";
+
 import { onsubmit } from '../../pages/HomePage/HomePage';
 import { SearchbarField } from '../Map/MapComponent.elements';
 import { value } from 'dom7';
@@ -116,6 +119,7 @@ const EventHandeler = (param) => {
 }
 
 const MapComponent = () => {
+    const tileLayer = useSelector(state=>state.routing.tileLayer)
     const [searchingActive, setSearchingActive] = useState(true)
     const [wikiEntries, setWikiEntries] = useState()
     const dispatch = useDispatch()
@@ -143,7 +147,6 @@ const MapComponent = () => {
         }
         getMarkers()
     }, [mapPosition, mapZoom])
-
     const getMarkerOnClick = useCallback(
         (entrie) => ({
             click: () => {
@@ -159,6 +162,27 @@ const MapComponent = () => {
     var d = 0
     var j = 0
     var finalPosition = []
+    const getLayer = useCallback(()=>{
+        console.log(tileLayer)
+        if(tileLayer == 0){
+            return <TileLayer
+                noWrap={true}
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+        } else if(tileLayer == 1){
+            return <TileLayer
+                url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
+                maxZoom={20}
+                subdomains={['mt1','mt2','mt3']}
+            />
+        } else if(tileLayer == 2){
+            return <WMSTileLayer
+                layers={'TOPO-OSM-WMS'}
+                url={`http://ows.mundialis.de/services/service?`}
+            />
+        }
+    }, [tileLayer])
     return (
         <Map
             center={mapPosition}
@@ -172,10 +196,44 @@ const MapComponent = () => {
             maxBoundsViscosity={0.8}
             minZoom={3}
         >
-            <TileLayer
-                noWrap={true}
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            {getLayer()}
+
+            <SearchbarField
+                init={true}
+                inline={true}
+                placeholder={"Suche deinen Weg"}
+                onInput={async (e) => {
+                    search = e.target.value
+                    searchPrint = search
+                }}
+                onSubmit={async (e) => {
+                    e.preventDefault()
+                    var mapPos = [0, 0]
+                    searchPrint = await findWikiEntriesByTitle(search).then((value) => {
+                        b = value[0]
+                        for (let [key] of Object.entries(b)) {
+                            c = key
+                        }
+                        finalPosition = b[c]["coordinates"]
+                        d = finalPosition[0]["lat"]
+                        j = finalPosition[0]["lon"]
+                        setC1(d)
+                        setC2(j)
+                        setSearchingActive(false)
+                        var mapPos = [c1, c2]
+                        //setMapPosition(mapPos)
+                        //console.log(mapPos)
+                    });
+                    setMapPosition(mapPos)
+                    console.log(mapPosition)
+                }
+                }
+                onClickDisable={true}
+                disableButton={false}
+                onClickClear={() => {
+                    setSearchingActive(true)
+                }}
+                backdropEl={false}
             />
             <SearchbarField
                 init={true}
