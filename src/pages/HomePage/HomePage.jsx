@@ -3,7 +3,12 @@ import { useCallback } from 'react';
 import {
     Page,
     Card,
-    CardHeader
+    CardHeader,
+    FabBackdrop,
+    Fab,
+    Icon,
+    FabButtons,
+    FabButton,
 } from 'framework7-react';
 import 'framework7-icons';
 
@@ -14,11 +19,11 @@ import {
     DetailSheet,
     SheetControlButton,
     Overlay,
-    SettingsButton
+    SettingsButton,
 } from "./HomePage.elements";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setRoutingActive } from '@/features/routing/routingSlice'
+import { setRoutingActive, setTileLayer } from '@/features/routing/routingSlice'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faList } from '@fortawesome/free-solid-svg-icons'
 
@@ -32,7 +37,18 @@ const HomePage = () => {
     const navigate = useCallback(() => {
         dispatch(setRoutingActive(!routingActive))
     }, [routingActive])
+    
+    const selectBasic = useCallback(()=>{
+        dispatch(setTileLayer(0))
+    })
 
+    const selectLayer1 = useCallback(()=>{
+        dispatch(setTileLayer(1))
+    })
+
+    const selectLayer2 = useCallback(()=>{
+        dispatch(setTileLayer(2))
+    })
     // Navigation instructions
     const instruction = useSelector(state => state.routing.instruction)
     let instructionElement = null
@@ -117,6 +133,18 @@ const HomePage = () => {
                     Navigieren
                 </NavigateButton>
             </DetailSheet>
+            <link rel="stylesheet" href="./css/buttons.css" />
+            <FabBackdrop slot="fixed"/>
+
+            <Fab id="layerFab" position="right-center" slot="fixed" border-radius="5%">
+                <Icon>Layer</Icon>
+                <Icon>Layer</Icon>
+                <FabButtons position="bottom">
+                    <FabButton id="fabButton1" onClick={selectBasic}></FabButton>
+                    <FabButton id="fabButton2" onClick={selectLayer1}></FabButton>
+                    <FabButton id="fabButton3" onClick={selectLayer2}></FabButton>
+                </FabButtons>
+            </Fab>
         </Page>
     );
 }
