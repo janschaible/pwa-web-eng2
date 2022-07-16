@@ -36,7 +36,16 @@ export const NavigateButton = styled(Button)`
     padding: 2rem;
     z-index: 1000;
     font-size: 3vw;
-    background-color: ${props => props.routingActive ? "red" : "blue"};
+    background-color: ${props=>{
+        if(props.disabled){
+          return "gray"          
+        }
+        if(props.routingActive){
+            return "red"
+          }else{
+            return "blue"
+          }
+      }};
     transition: 2s ease-in-out;
 `
 
@@ -60,4 +69,17 @@ export const SheetControlButton = styled(Button)`
     left: 0;
     right: 0;
 `
-//${props=>props.visible?"translate(0)":"translate(0, calc(1.5rem+100%))"}
+
+export const FavoritesButton = styled(Button)`
+    position: absolute;
+    width: 5%;
+    bottom: 5.5rem;
+    right: 5%;
+    color: ${props=>props.favorite?"yellow":"white"};
+    background-color: ${props=>{
+        if(props.disabled){
+          return "gray"
+        }
+        return "blue"
+      }};
+`
