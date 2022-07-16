@@ -4,6 +4,7 @@ import {TileLayer,Polyline,Marker,useMapEvents}from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
 import {useDispatch, useSelector} from 'react-redux';
+import constants from '@/js/constants';
 import {
     setMapPosition,
     setMapZoom,
@@ -12,7 +13,7 @@ import {
     setTargetPosition
 } from '@/features/routing/routingSlice'
 import {f7} from 'framework7-react';
-import {findWikiEntries} from "../../features/wikiPosts/wikiEntries";
+import {findWikiEntries} from "@/features/wikiPosts/wikiEntries";
 
 const EventHandeler = () => {
     const dispatch = useDispatch()
@@ -50,7 +51,7 @@ const EventHandeler = () => {
         window.navigator.geolocation.getCurrentPosition(position=>{
             const lat = position.coords.latitude
             const long = position.coords.longitude
-            map.flyTo([lat,long],map.getZoom())
+            map.flyTo([lat,long],constants.mapFlyToZoom)
             dispatch(setCurrentPosition([lat,long]))
         }, ()=>setLocatingError(true))
     },[startUp])
@@ -68,7 +69,7 @@ const EventHandeler = () => {
             }
             const lat = position.coords.latitude
             const long = position.coords.longitude
-            map.flyTo([lat,long],map.getZoom())
+            map.flyTo([lat,long],constants.mapFlyToZoom)
             dispatch(setCurrentPosition([lat,long]))
         }, ()=>setLocatingError(true))
 
@@ -81,6 +82,8 @@ const EventHandeler = () => {
                 const lat = position.coords.latitude
                 const long = position.coords.longitude
                 if(following){
+                    //fly to the location with the current map zoom
+                    //that allows the user to zoom in and out while being routed
                     map.flyTo([lat,long],map.getZoom())
                 }
                 dispatch(setCurrentPosition([lat,long]))
@@ -94,7 +97,7 @@ const EventHandeler = () => {
     //fly to target position when that changes
     useEffect(()=>{
         if(!targetPosition)return
-        map.flyTo([targetPosition.lat,targetPosition.lon],map.getZoom())
+        map.flyTo([targetPosition.lat,targetPosition.lon],constants.mapFlyToZoom)
     },[targetPosition])
 
     //alert user if we cannot get their location
