@@ -37,7 +37,6 @@ export const NavigateButton = styled(Button)`
     z-index: 1000;
     font-size: 3vw;
     background-color: ${props=>{
-      console.log("navigate btn ", props.disabled)
         if(props.disabled){
           return "gray"          
         }
@@ -76,8 +75,8 @@ export const FavoritesButton = styled(Button)`
     width: 5%;
     bottom: 5.5rem;
     right: 5%;
+    color: ${props=>props.favorite?"yellow":"white"};
     background-color: ${props=>{
-      console.log("fav button disabled",props.disabled)
         if(props.disabled){
           return "gray"
         }

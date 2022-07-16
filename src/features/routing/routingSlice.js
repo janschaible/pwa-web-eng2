@@ -20,7 +20,8 @@ export const routingSlice = createSlice({
         following: false,
         showLastPath: getItemFromStorage("showLastPath",true),
         lastPath:[],
-        lastTargets: getItemFromStorage("lastTargets",[])
+        lastTargets: getItemFromStorage("lastTargets",[]),
+        favorites: getItemFromStorage("favorites",[])
     },
     reducers: {
         setStartUp: (state, action) => {
@@ -83,6 +84,14 @@ export const routingSlice = createSlice({
             localStorage.setItem("showLastPath", JSON.stringify(action.payload));
             state.showLastPath = action.payload
         },
+        addFavorite:(state, action) => {
+            state.favorites.unshift(action.payload)
+            localStorage.setItem("favorites", JSON.stringify(state.favorites));
+        },
+        removeFavorite:(state, action) => {
+            state.favorites = state.favorites.filter(favorite=>favorite.pageid!=action.payload.pageid)
+            localStorage.setItem("favorites", JSON.stringify(state.favorites));
+        }
     }
 })
 
@@ -95,7 +104,9 @@ export const {
     setInstruction,
     setRoutingActive,
     setFollowing,
-    setShowLastPath
+    setShowLastPath,
+    addFavorite,
+    removeFavorite
 } = routingSlice.actions
 
 export default routingSlice.reducer

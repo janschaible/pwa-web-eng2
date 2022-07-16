@@ -19,7 +19,11 @@ import {
 } from "./HomePage.elements";
 
 import {useDispatch, useSelector} from "react-redux";
-import {setRoutingActive} from '@/features/routing/routingSlice'
+import {
+    setRoutingActive,
+    removeFavorite,
+    addFavorite
+} from '@/features/routing/routingSlice'
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faList} from '@fortawesome/free-solid-svg-icons'
@@ -31,6 +35,7 @@ const HomePage = () => {
     const routingActive = useSelector(state => state.routing.routingActive)
     const currentPosition = useSelector(state => state.routing.currentPosition)
     const targetPosition = useSelector(state => state.routing.targetPosition)
+    const favorites = useSelector(state => state.routing.favorites)
     const [currentCountry, setCurrentCountry] = useState()
     const [currentState, setCurrentState] = useState()
     const [currentCity, setCurrentCity] = useState()
@@ -75,6 +80,25 @@ const HomePage = () => {
     const navigate = useCallback(() => {
         dispatch(setRoutingActive(!routingActive))
     }, [routingActive])
+
+    const isTargetFavorite = useCallback(()=>{
+        if (!favorites || !targetPosition)return false
+        for(let favorite of favorites){
+            if(favorite.pageid == targetPosition.pageid){
+                return true
+            }
+        }
+        return false
+    },[targetPosition,favorites])
+
+    const toggleFavorite = useCallback(()=>{
+        if (!favorites || !targetPosition)return
+        if(isTargetFavorite()){
+            dispatch(removeFavorite(targetPosition))
+            return
+        }
+        dispatch(addFavorite(targetPosition))
+    },[targetPosition,favorites,isTargetFavorite])
 
     // Navigation instructions
     const instruction = useSelector(state => state.routing.instruction)
@@ -121,8 +145,10 @@ const HomePage = () => {
                 </div>
                 <FavoritesButton
                     large fill round
-                    iconF7="star"
+                    iconF7={isTargetFavorite()?"star_fill":"star"}
+                    favorite={isTargetFavorite()}
                     disabled={targetPosition==undefined}
+                    onClick={toggleFavorite}
                 >
                 </FavoritesButton>
                 <NavigateButton
@@ -161,8 +187,10 @@ const HomePage = () => {
                 </div>
                 <FavoritesButton
                     large fill round
-                    iconF7="star"
+                    iconF7={isTargetFavorite()?"star_fill":"star"}
+                    favorite={isTargetFavorite()}
                     disabled={targetPosition==undefined}
+                    onClick={toggleFavorite}
                 >
                 </FavoritesButton>
                 <NavigateButton
