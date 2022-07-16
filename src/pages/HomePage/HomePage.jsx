@@ -4,11 +4,6 @@ import {
     Page,
     Card,
     CardHeader,
-    FabBackdrop,
-    Fab,
-    Icon,
-    FabButtons,
-    FabButton,
 } from 'framework7-react';
 import 'framework7-icons';
 
@@ -27,20 +22,18 @@ import {useDispatch, useSelector} from "react-redux";
 import {
     setRoutingActive,
     removeFavorite,
-    addFavorite,
-    setTileLayer
+    addFavorite
 } from '@/features/routing/routingSlice'
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faList} from '@fortawesome/free-solid-svg-icons'
 import {getLocation} from "../../js/rev-geo";
 
-export var onsubmit
+
 const HomePage = () => {
     const dispatch = useDispatch()
     const routingActive = useSelector(state => state.routing.routingActive)
     const currentPosition = useSelector(state => state.routing.currentPosition)
-    const mapZoom = useSelector(state => state.routing.mapZoom)
     const targetPosition = useSelector(state => state.routing.targetPosition)
     const favorites = useSelector(state => state.routing.favorites)
     const [currentCountry, setCurrentCountry] = useState()
@@ -87,14 +80,6 @@ const HomePage = () => {
     const navigate = useCallback(() => {
         dispatch(setRoutingActive(!routingActive))
     }, [routingActive])
-    
-    const selectBasic = useCallback(()=>{
-        dispatch(setTileLayer(0))
-    })
-
-    const selectLayer1 = useCallback(()=>{
-        dispatch(setTileLayer(1))
-    })
 
     /**
      * @return true if the currently selected targetlocation is a user faforite false if not
@@ -108,11 +93,7 @@ const HomePage = () => {
         }
         return false
     },[targetPosition,favorites])
-        
-        const selectLayer2 = useCallback(()=>{
-        dispatch(setTileLayer(2))
-    })
-    // Navigation instructions
+
     /**
      * onclick for the faforite button,
      * toggles the favorite state of the selected target
@@ -139,9 +120,10 @@ const HomePage = () => {
                 </CardHeader>
             </Card>
     }
+
     return (
         <Page name="home">
-            <MapComponent />
+            <MapComponent/>
             <Overlay>
                 {instructionElement}
                 <SettingsButton href="/settings" sheetClose={true}>
@@ -160,7 +142,7 @@ const HomePage = () => {
                     sheetOpen=".detailSheet"
                 >
                 </SheetControlButton>
-                <div style={{ display: "flex", flex: "row" }}>
+                <div style={{display: "flex", flex: "row"}}>
                     <div>
                         <h1 style={{marginLeft: "50px"}}>{currentCountry}</h1>
                         <h2 style={{marginLeft: "50px"}}>{currentCity}</h2>
@@ -198,7 +180,7 @@ const HomePage = () => {
                     sheetOpen=".navigateSheet"
                 >
                 </SheetControlButton>
-                <div style={{ display: "flex", flex: "row" }}>
+                <div style={{display: "flex", flex: "row"}}>
                     <div>
                         <h1 style={{marginLeft: "50px"}}>{currentCountry}</h1>
                         <h2 style={{marginLeft: "50px"}}>{currentState}</h2>
@@ -230,18 +212,6 @@ const HomePage = () => {
                     Navigieren
                 </NavigateButton>
             </DetailSheet>
-            <link rel="stylesheet" href="./css/buttons.css" />
-            <FabBackdrop slot="fixed"/>
-
-            <Fab id="layerFab" position="right-center" slot="fixed" border-radius="5%">
-                <Icon>Layer</Icon>
-                <Icon>Layer</Icon>
-                <FabButtons position="bottom">
-                    <FabButton id="fabButton1" onClick={selectBasic}></FabButton>
-                    <FabButton id="fabButton2" onClick={selectLayer1}></FabButton>
-                    <FabButton id="fabButton3" onClick={selectLayer2}></FabButton>
-                </FabButtons>
-            </Fab>
         </Page>
     );
 }
