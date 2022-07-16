@@ -28,7 +28,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faList } from '@fortawesome/free-solid-svg-icons'
 
 export var onsubmit
-
 const HomePage = () => {
     const dispatch = useDispatch()
     const routingActive = useSelector(state => state.routing.routingActive)
@@ -38,7 +37,7 @@ const HomePage = () => {
     const navigate = useCallback(() => {
         dispatch(setRoutingActive(!routingActive))
     }, [routingActive])
-
+    
     const selectBasic = useCallback(()=>{
         dispatch(setTileLayer(0))
     })
@@ -50,7 +49,6 @@ const HomePage = () => {
     const selectLayer2 = useCallback(()=>{
         dispatch(setTileLayer(2))
     })
-
     // Navigation instructions
     const instruction = useSelector(state => state.routing.instruction)
     let instructionElement = null

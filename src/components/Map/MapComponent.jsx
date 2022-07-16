@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Map } from './MapComponent.elements'
-import { TileLayer, Polyline, Marker, useMapEvents,WMSTileLayer } from 'react-leaflet'
+
+import { TileLayer, Polyline, Marker, useMapEvents,Popup, WMSTileLayer } from 'react-leaflet'
+
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,7 +15,12 @@ import {
 } from '@/features/routing/routingSlice'
 import { f7 } from 'framework7-react';
 import { findWikiEntries, findWikiEntriesByTitle, findWikiPageId } from "../../features/wikiPosts/wikiEntries";
+
+import { onsubmit } from '../../pages/HomePage/HomePage';
 import { SearchbarField } from '../Map/MapComponent.elements';
+import { value } from 'dom7';
+import { map } from 'leaflet';
+import { setFollowing } from '../../features/routing/routingSlice';
 
 const EventHandeler = (param) => {
     const dispatch = useDispatch()
@@ -223,6 +230,52 @@ const MapComponent = () => {
                 }
                 onClickDisable={true}
                 disableButton={false}
+                onClickClear={() => {
+                    setSearchingActive(true)
+                }}
+                backdropEl={false}
+            />
+            <SearchbarField
+                init={true}
+                inline={true}
+                placeholder={"Suche deinen Weg"}
+                onInput={(e) => {
+                    search = e.target.value
+                    searchPrint = search
+                }}
+                onSubmit={async (e) => {
+                    e.preventDefault()
+                    var mapPos = [0, 0]
+                    searchPrint = await findWikiEntriesByTitle(search).then((value) => {
+                        b = value[0]
+                        console.log(value)
+                        for (let [key] of Object.entries(b)) {
+                            c = key
+                        }
+                        finalPosition = b[c]["coordinates"]
+                        d = finalPosition[0]["lat"]
+                        j = finalPosition[0]["lon"]
+                        setC1(d)
+                        setC2(j)
+                        setSearchingActive(false)
+                        var mapPos = [c1, c2]
+                        let wikiEntrie = {
+                            lat: d, 
+                            lon: j,
+                            ...b[c]
+                        }
+                        dispatch(setTargetPosition(wikiEntrie))
+                        //dispatch(setTargetPosition())
+                        //setMapPosition(mapPos)
+                        //console.log(mapPos)
+
+                    });
+                    //console.log(mapPosition)
+                }
+                }
+                
+                disableButton={true}
+                disableButtonText={"cANCEL"}
                 onClickClear={() => {
                     setSearchingActive(true)
                 }}
