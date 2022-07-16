@@ -14,7 +14,6 @@ import {
     DetailSheet,
     SheetControlButton,
     Overlay,
-<<<<<<< HEAD
     SettingsButton,
     FavoritesButton
 } from "./HomePage.elements";
@@ -30,15 +29,6 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faList} from '@fortawesome/free-solid-svg-icons'
 import {getLocation} from "../../js/rev-geo";
-=======
-    SettingsButton
-} from "./HomePage.elements";
-
-import { useDispatch, useSelector } from "react-redux";
-import { setRoutingActive } from '@/features/routing/routingSlice'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faList } from '@fortawesome/free-solid-svg-icons'
->>>>>>> parent of 1824c61 (adding changeable layers (#3))
 
 export var onsubmit
 const HomePage = () => {
@@ -93,7 +83,6 @@ const HomePage = () => {
         dispatch(setRoutingActive(!routingActive))
     }, [routingActive])
 
-<<<<<<< HEAD
     const selectLayer1 = useCallback(()=>{
         dispatch(setTileLayer(1))
     })
@@ -114,8 +103,6 @@ const HomePage = () => {
         const selectLayer2 = useCallback(()=>{
         dispatch(setTileLayer(2))
     })
-=======
->>>>>>> parent of 1824c61 (adding changeable layers (#3))
     // Navigation instructions
     /**
      * onclick for the faforite button,
