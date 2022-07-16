@@ -29,12 +29,8 @@ import { setFollowing } from '../../features/routing/routingSlice';
  * Component handles any event that requires access to the map
  * furthermore it keeps the maps state with the app's state in sync
  */
-const EventHandeler = () => {
-    const dispatch = useDispatch()
-    const [locatingError,setLocatingError] = useState(false)
-    const [locationPoller,setLocationPoller] = useState()
 
-const EventHandeler = (param) => {
+const EventHandeler = () => {
     const dispatch = useDispatch()
     const [locatingError, setLocatingError] = useState(false)
     const [locationPoller, setLocationPoller] = useState()
