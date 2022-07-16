@@ -5,6 +5,9 @@ import { faArrowLeft,faUser } from '@fortawesome/free-solid-svg-icons'
 import { setShowLastPath } from '@/features/routing/routingSlice'
 import { useDispatch, useSelector } from 'react-redux';
 
+/**
+ * Page for listing all settings and features that the user can interact with
+ */
 const SettingsPage = ()=>{
     const dispatch = useDispatch()
     const showLastPath = useSelector(state => state.routing.showLastPath)
@@ -18,6 +21,9 @@ const SettingsPage = ()=>{
 
                 <PageIcon icon={faUser}/>
                 <ItemList>
+                    <ListItem link="/settings/favorites">
+                        Favoriten anzeigen
+                    </ListItem>
                     <ListItem>
                         <span>Letzte Wege anzeigen</span>
                         <Toggle onChange={e=>dispatch(setShowLastPath(!showLastPath))} checked={showLastPath}/>
