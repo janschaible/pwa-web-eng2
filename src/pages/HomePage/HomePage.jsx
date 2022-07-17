@@ -72,7 +72,7 @@ const HomePage = () => {
     useEffect(() => {
         if (targetPosition != null) {
             const getTargetString = async () => {
-                const target = await getLocation(currentPosition[0], currentPosition[1])
+                const target = await getLocation(targetPosition.lat, targetPosition.lon)
                 const targetArray = target.split("\n")
                 setTargetCountry(targetArray[0])
                 setTargetState(targetArray[1])

@@ -50,13 +50,13 @@ export const NavigateButton = styled(Button)`
 `
 
 export const NavigateSheet = styled(Sheet)`
-    height: 15%;
+    height: 25%;
     width: 100%;
     border-radius: 25px;
 `
 
 export const DetailSheet = styled(Sheet)`
-    height: 20%;
+    height: auto;
     width: 100%;
     border-radius: 25px;
 `
