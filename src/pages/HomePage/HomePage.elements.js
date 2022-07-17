@@ -34,13 +34,10 @@ export const SettingsButton = styled(Link)`
 `
 
 export const NavigateButton = styled(Button)`
-    position: absolute;
-    bottom: 1rem;
-    width: 25%;
-    right: 5%;
-    padding: 2rem;
-    z-index: 1000;
-    font-size: 3vw;
+    max-width: 500px;
+    flex-grow: 1;
+    margin-right: 2rem;
+    font-size: min(10vw,2rem);
     background-color: ${props=>{
         if(props.disabled){
           return "gray"          
@@ -76,10 +73,8 @@ export const SheetControlButton = styled(Button)`
 `
 
 export const FavoritesButton = styled(Button)`
-    position: absolute;
-    width: 5%;
-    bottom: 5.5rem;
-    right: 5%;
+    flex-grow: 1;
+    max-width: 100px;
     color: ${props=>props.favorite?"yellow":"white"};
     background-color: ${props=>{
         if(props.disabled){
@@ -102,4 +97,18 @@ export const FabSattelite = styled(FabButton)`
 export const FabPainting = styled(FabButton)`
   background-image: url(/images/map_img3.png) !important;
   background-size: 50px;
+`
+
+export const ArrowContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+  font-size: 2rem;
+  flex-direction: column;
+`
+
+export const DetailButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
 `

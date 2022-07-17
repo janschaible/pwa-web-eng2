@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState,useRef} from 'react';
 
 import {
     f7,
@@ -8,6 +8,7 @@ import {
     Fab,
     Icon,
     FabButtons,
+    Sheet
 } from 'framework7-react';
 import 'framework7-icons';
 
@@ -15,15 +16,14 @@ import MapComponent from '/components/Map/MapComponent'
 import {
     NavigateButton,
     SearchbarField,
-    NavigateSheet,
-    DetailSheet,
-    SheetControlButton,
     Overlay,
     SettingsButton,
-    FavoritesButton,
     FabPainting,
     FabSattelite,
-    FabRegular
+    FabRegular,
+    ArrowContainer,
+    DetailButtonContainer,
+    FavoritesButton
 } from "./HomePage.elements";
 
 import {useDispatch, useSelector} from "react-redux";
@@ -36,11 +36,12 @@ import {
 } from '@/features/routing/routingSlice'
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faList} from '@fortawesome/free-solid-svg-icons'
+import {faList,faArrowUp} from '@fortawesome/free-solid-svg-icons'
 import {getLocation} from "../../js/rev-geo";
-import {findWikiEntriesByTitle} from "@/features/wikiPosts/wikiEntries";
+import {findWikiEntriesByTitle,findWikiByPageID} from "@/features/wikiPosts/wikiEntries";
 
 const HomePage = () => {
+    const sheetRef = useRef()
     const dispatch = useDispatch()
     const routingActive = useSelector(state => state.routing.routingActive)
     const currentPosition = useSelector(state => state.routing.currentPosition)
@@ -57,6 +58,7 @@ const HomePage = () => {
     const [targetStreet, setTargetStreet] = useState()
     const [targetHousenumber, setTargetHousenumber] = useState()
     const [search,setSearch] = useState()
+    const [targetDescription,setTargetDescription] = useState()
 
     useEffect(() => {
         if (currentPosition != null) {
@@ -154,6 +156,20 @@ const HomePage = () => {
     },[search])
 
     /**
+     * get the full wiki page
+     */
+    useEffect(()=>{
+        if(!targetPosition){
+            setTargetDescription(null)
+            return
+        }
+        findWikiByPageID(targetPosition.pageid).then((response)=>{
+            setTargetDescription(response?response.extract:null)
+        })
+    },[targetPosition])
+
+
+    /**
      * Navigation instructions
      */
      
@@ -200,88 +216,68 @@ const HomePage = () => {
                     </FabButtons>
                 </Fab>
             </Overlay>
-            {/*To-DO: CSS-styling for Sheets especially concerning responsiveness (ask other Team-Members
-                  how they want it to look
-                  Fill headings with actual Data once Rev-Geocoding is merged*/}
-            <NavigateSheet
-                className="navigateSheet"
-                opened backdrop={false}
-            >
-                <SheetControlButton
-                    round iconF7="chevron_up" iconColor="black" iconSize="44px"
-                    sheetOpen=".detailSheet"
-                >
-                </SheetControlButton>
-                <div style={{ display: "flex", flex: "row" }}>
-                    <div>
-                        <h1 style={{marginLeft: "50px"}}>{currentCountry}</h1>
-                        <h2 style={{marginLeft: "50px"}}>{currentCity}</h2>
-                    </div>
-                    <div>
-                        <h1 style={{marginLeft: "100px"}}>{targetCountry}</h1>
-                        <h2 style={{marginLeft: "100px"}}>{targetCity}</h2>
-                    </div>
-                </div>
-                <FavoritesButton
-                    large fill round
-                    iconF7={isTargetFavorite()?"star_fill":"star"}
-                    favorite={isTargetFavorite()}
-                    disabled={targetPosition==undefined}
-                    onClick={toggleFavorite}
-                >
-                </FavoritesButton>
-                <NavigateButton
-                    large fill round
-                    onClick={navigate}
-                    routingActive={routingActive}
-                    visible={currentPosition != null}
-                    disabled={targetPosition==undefined}
-                >
-                    Navigieren
-                </NavigateButton>
-
-            </NavigateSheet>
-            <DetailSheet
-                className="detailSheet"
+            <Sheet
+                ref={sheetRef}
+                opened={targetPosition!=undefined}
+                className="demo-sheet-swipe-to-step"
+                style={{height: 'auto', '--f7-sheet-bg-color': '#fff'}}
+                swipeToStep
                 backdrop={false}
             >
-                <SheetControlButton
-                    round iconF7="chevron_down" iconColor="black" iconSize="44px"
-                    sheetOpen=".navigateSheet"
-                >
-                </SheetControlButton>
-                <div style={{ display: "flex", flex: "row" }}>
-                    <div>
-                        <h1 style={{marginLeft: "50px"}}>{currentCountry}</h1>
-                        <h2 style={{marginLeft: "50px"}}>{currentState}</h2>
-                        <h2 style={{marginLeft: "50px"}}>{currentCity}</h2>
-                        <h2 style={{marginLeft: "50px"}}>{currentStreet} {currentHousenumber}</h2>
-                    </div>
-                    <div>
-                        <h1 style={{marginLeft: "100px"}}>{targetCountry}</h1>
-                        <h2 style={{marginLeft: "100px"}}>{targetState}</h2>
-                        <h2 style={{marginLeft: "100px"}}>{targetCity}</h2>
-                        <h2 style={{marginLeft: "100px"}}>{targetStreet} {targetHousenumber}</h2>
-                    </div>
+                {/* Initial swipe step sheet content */}
+                <div className="sheet-modal-swipe-step">
+                    <ArrowContainer>
+                        <FontAwesomeIcon icon={faArrowUp}/>
+                        <span style={{textAlign:"center"}}>
+                            {targetPosition?targetPosition.title:""}
+                        </span>
+                        <div className="margin-top text-align-center" style={{fontSize:"1rem"}}>
+                            Für mehr Details nach oben ziehen
+                        </div>
+                    </ArrowContainer>
+                    <DetailButtonContainer>
+                        <NavigateButton
+                            large fill round
+                            onClick={navigate}
+                            routingActive={routingActive}
+                            visible={currentPosition != null}
+                            disabled={targetPosition==undefined}
+                        >
+                            Navigieren
+                        </NavigateButton>
+                        <FavoritesButton
+                            large fill round
+                            iconF7={isTargetFavorite()?"star_fill":"star"}
+                            favorite={isTargetFavorite()}
+                            disabled={targetPosition==undefined}
+                            onClick={toggleFavorite}
+                        />
+                    </DetailButtonContainer>
                 </div>
-                <FavoritesButton
-                    large fill round
-                    iconF7={isTargetFavorite()?"star_fill":"star"}
-                    favorite={isTargetFavorite()}
-                    disabled={targetPosition==undefined}
-                    onClick={toggleFavorite}
-                >
-                </FavoritesButton>
-                <NavigateButton
-                    large fill round
-                    onClick={navigate}
-                    routingActive={routingActive}
-                    visible={currentPosition != null}
-                    disabled={targetPosition==undefined}
-                >
-                    Navigieren
-                </NavigateButton>
-            </DetailSheet>
+                {/* Rest of the sheet content that will opened with swipe */}
+                {routingActive?"":(
+                    <div style={{paddingBottom:"2rem"}}>
+                        <p>{targetDescription}</p>
+                        <div style={{ display: "flex",justifyContent:"space-around",flexWrap:"wrap"}}>
+                            <div>
+                                <h1>Deine Position:</h1>
+                                <h2 style={{marginLeft: "50px"}}>{currentCountry}</h2>
+                                <h3 style={{marginLeft: "50px"}}>{currentState}</h3>
+                                <h3 style={{marginLeft: "50px"}}>{currentCity}</h3>
+                                <h3 style={{marginLeft: "50px"}}>{currentStreet} {currentHousenumber}</h3>
+                            </div>
+                            <div>
+                                <h1>Die Zielposition:</h1>
+                                <h2 style={{marginLeft: "50px"}}>{targetCountry}</h2>
+                                <h3 style={{marginLeft: "50px"}}>{targetState}</h3>
+                                <h3 style={{marginLeft: "50px"}}>{targetCity}</h3>
+                                <h3 style={{marginLeft: "50px"}}>{targetStreet} {targetHousenumber}</h3>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+            </Sheet>
         </Page>
     );
 }

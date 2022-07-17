@@ -32,7 +32,6 @@ export async function findWikiEntries(lat, lon, mapZoom) {
       collection.push(pages[place]);
     }
   } catch {
-    console.log("failed to find wiki entries");
   }
   return collection;
 }
@@ -59,9 +58,21 @@ export async function findWikiEntriesByTitle(title) {
       collection.push(pages[place]);
     }
   } catch {
-    console.log("failed to find wiki entries");
   }
   return collection;
+}
+
+export async function findWikiByPageID(id){
+  `https://de.wikipedia.org/w/api.php?format=json&action=parse&pageid=${id}`
+  try {
+    console.log(`https://de.wikipedia.org/w/api.php?format=json&action=parse&pageid=${id}`)
+    const response = await fetch(url)
+    console.log("response",response)
+    const marsheledResponse = await response.json()
+    const pages = marsheledResponse.query;
+    return pages[0]
+  } catch {
+  }
 }
 
 export async function findWikiPageId(title) {
@@ -85,7 +96,6 @@ export async function findWikiPageId(title) {
       collection.push(pages[place]);
     }
   } catch {
-    console.log("failed to find wiki entries");
   }
   return collection;
 }
