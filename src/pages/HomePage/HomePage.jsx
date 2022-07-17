@@ -4,11 +4,9 @@ import {
     Page,
     Card,
     CardHeader,
-    FabBackdrop,
     Fab,
     Icon,
     FabButtons,
-    FabButton,
 } from 'framework7-react';
 import 'framework7-icons';
 
@@ -20,7 +18,10 @@ import {
     SheetControlButton,
     Overlay,
     SettingsButton,
-    FavoritesButton
+    FavoritesButton,
+    FabPainting,
+    FabSattelite,
+    FabRegular
 } from "./HomePage.elements";
 
 import {useDispatch, useSelector} from "react-redux";
@@ -147,6 +148,15 @@ const HomePage = () => {
                 <SettingsButton href="/settings" sheetClose={true}>
                     <FontAwesomeIcon icon={faList}/>
                 </SettingsButton>
+                <Fab border-radius="5%">
+                    <Icon>Layer</Icon>
+                    <Icon>Layer</Icon>
+                    <FabButtons position="bottom">
+                        <FabRegular id="fabButton1" onClick={selectBasic}/>
+                        <FabSattelite id="fabButton2" onClick={selectLayer1}/>
+                        <FabPainting id="fabButton3" onClick={selectLayer2}/>
+                    </FabButtons>
+                </Fab>
             </Overlay>
             {/*To-DO: CSS-styling for Sheets especially concerning responsiveness (ask other Team-Members
                   how they want it to look
@@ -230,18 +240,6 @@ const HomePage = () => {
                     Navigieren
                 </NavigateButton>
             </DetailSheet>
-            <link rel="stylesheet" href="./css/buttons.css" />
-            <FabBackdrop slot="fixed"/>
-
-            <Fab id="layerFab" position="right-center" slot="fixed" border-radius="5%">
-                <Icon>Layer</Icon>
-                <Icon>Layer</Icon>
-                <FabButtons position="bottom">
-                    <FabButton id="fabButton1" onClick={selectBasic}></FabButton>
-                    <FabButton id="fabButton2" onClick={selectLayer1}></FabButton>
-                    <FabButton id="fabButton3" onClick={selectLayer2}></FabButton>
-                </FabButtons>
-            </Fab>
         </Page>
     );
 }
