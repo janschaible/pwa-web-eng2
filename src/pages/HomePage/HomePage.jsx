@@ -153,10 +153,10 @@ const HomePage = () => {
                             lon: lon,
                             ...b[c]
                         }
+                        dispatch(setTargetPosition(wikiEntrie))
                     }catch{
                         f7.dialog.alert("Leider haben wir für diese Suche keine Ergebnisse gefunden")
                     }
-                    dispatch(setTargetPosition(wikiEntrie))
                 }
                 else {
                     f7.dialog.alert("Leider haben wir für diese Suche keine Ergebnisse gefunden")
