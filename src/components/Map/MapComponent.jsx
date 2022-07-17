@@ -18,8 +18,7 @@ import {
     setTargetPosition
 } from '@/features/routing/routingSlice'
 import {f7} from 'framework7-react';
-import {findWikiEntries, findWikiEntriesByTitle} from "@/features/wikiPosts/wikiEntries";
-import { SearchbarField } from '../Map/MapComponent.elements';
+import {findWikiEntries} from "@/features/wikiPosts/wikiEntries";
 import L from 'leaflet'
 
 /**
@@ -70,7 +69,6 @@ const EventHandeler = () => {
             setActiveLayer(null)
         }
         if (tileLayer==0) {
-            console.log("setting layer 0")
             const layer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
                 attribution:"&copy; <a href=&quot;https://www.openstreetmap.org/copyright&quot;>OpenStreetMap</a> contributors"
 
@@ -79,7 +77,6 @@ const EventHandeler = () => {
             map.addLayer(layer)
         }
         if (tileLayer==1) {
-            console.log("setting layer 1")
             const layer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
                 maxZoom: 20,
                 subdomains: ['mt1','mt2','mt3']
@@ -88,7 +85,6 @@ const EventHandeler = () => {
             map.addLayer(layer)
         }
         if (tileLayer==2) {
-            console.log("setting layer 2")
             const layer = L.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png",
             {
                 attribution:
@@ -183,7 +179,6 @@ const EventHandeler = () => {
  *  and the routing component so that they have access to the map 
  */
 const MapComponent = ()=>{
-    const [searchingActive, setSearchingActive] = useState(true)
     const [wikiEntries, setWikiEntries] = useState()
     const dispatch = useDispatch()
     const routingActive = useSelector(state=>state.routing.routingActive)
@@ -224,15 +219,6 @@ const MapComponent = ()=>{
                 dispatch(setTargetPosition(entrie))
             },
         }), [])
-    let search = ''
-    const [c1, setC1] = useState(0)
-    const [c2, setC2] = useState(0)
-    let searchPrint = ''
-    var c = 0
-    let b = ['']
-    var d = 0
-    var j = 0
-    var finalPosition = []
 
     /**
      * the map center is only set once on initialization
@@ -252,47 +238,6 @@ const MapComponent = ()=>{
             maxBoundsViscosity={0.8}
             minZoom={3}
         >
-            <SearchbarField
-                init={true}
-                inline={true}
-                placeholder={"Suche deinen Weg"}
-                onInput={(e) => {
-                    search = e.target.value
-                    searchPrint = search
-                }}
-                onSubmit={async (e) => {
-                    e.preventDefault()
-                    searchPrint = await findWikiEntriesByTitle(search).then((value) => {
-                        b = value[0]
-                        console.log(value)
-                        for (let [key] of Object.entries(b)) {
-                            c = key
-                        }
-                        finalPosition = b[c]["coordinates"]
-                        d = finalPosition[0]["lat"]
-                        j = finalPosition[0]["lon"]
-                        setC1(d)
-                        setC2(j)
-                        setSearchingActive(false)
-                        let wikiEntrie = {
-                            lat: d, 
-                            lon: j,
-                            ...b[c]
-                        }
-                        dispatch(setTargetPosition(wikiEntrie))
-
-                    });
-                }
-                }
-                style={{display:"none"}}
-                disableButton={true}
-                disableButtonText={"cANCEL"}
-                onClickClear={() => {
-                    setSearchingActive(true)
-                }}
-                backdropEl={false}
-            />
-            {!searchingActive ? <Marker position={[c1, c2]} >Hallo</Marker> : <></>}
             {getLastPathPoly()}
             {wikiEntries && !routingActive ? wikiEntries.map(entrie => {
                 return (

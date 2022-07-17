@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Link, Button, Sheet,FabButton} from 'framework7-react';
+import { Link, Button, Sheet,FabButton,Searchbar} from 'framework7-react';
 
 export const Overlay = styled.div`
   position: absolute;
@@ -14,6 +14,10 @@ export const Overlay = styled.div`
   *{
     pointer-events: all;
   }
+`
+
+export const SearchbarField = styled(Searchbar)`
+  width: 100% !important;
 `
 
 export const SettingsButton = styled(Link)`

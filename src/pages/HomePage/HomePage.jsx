@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 
 import {
+    f7,
     Page,
     Card,
     CardHeader,
@@ -13,6 +14,7 @@ import 'framework7-icons';
 import MapComponent from '/components/Map/MapComponent'
 import {
     NavigateButton,
+    SearchbarField,
     NavigateSheet,
     DetailSheet,
     SheetControlButton,
@@ -29,19 +31,19 @@ import {
     setRoutingActive,
     removeFavorite,
     addFavorite,
-    setTileLayer
+    setTileLayer,
+    setTargetPosition
 } from '@/features/routing/routingSlice'
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faList} from '@fortawesome/free-solid-svg-icons'
 import {getLocation} from "../../js/rev-geo";
+import {findWikiEntriesByTitle} from "@/features/wikiPosts/wikiEntries";
 
-export var onsubmit
 const HomePage = () => {
     const dispatch = useDispatch()
     const routingActive = useSelector(state => state.routing.routingActive)
     const currentPosition = useSelector(state => state.routing.currentPosition)
-    const mapZoom = useSelector(state => state.routing.mapZoom)
     const targetPosition = useSelector(state => state.routing.targetPosition)
     const favorites = useSelector(state => state.routing.favorites)
     const [currentCountry, setCurrentCountry] = useState()
@@ -54,6 +56,7 @@ const HomePage = () => {
     const [targetCity, setTargetCity] = useState()
     const [targetStreet, setTargetStreet] = useState()
     const [targetHousenumber, setTargetHousenumber] = useState()
+    const [search,setSearch] = useState()
 
     useEffect(() => {
         if (currentPosition != null) {
@@ -126,25 +129,64 @@ const HomePage = () => {
         dispatch(addFavorite(targetPosition))
     },[targetPosition,favorites,isTargetFavorite])
 
+    const onClickSearch = useCallback((e) => {
+        e.preventDefault()
+        findWikiEntriesByTitle(search).then((value) => {
+            const b = value[0]
+            let c;
+            for (let [key] of Object.entries(b)) {
+                c = key
+            }
+            const finalPosition = b[c]["coordinates"]
+            if(!finalPosition){
+                f7.dialog.alert("Leider haben wir für diese Suche keine Ergebnisse gefunden")
+                return
+            }
+            const lat = finalPosition[0]["lat"]
+            const lon = finalPosition[0]["lon"]
+            let wikiEntrie = {
+                lat: lat, 
+                lon: lon,
+                ...b[c]
+            }
+            dispatch(setTargetPosition(wikiEntrie))
+        });
+    },[search])
+
     /**
      * Navigation instructions
      */
      
     const instruction = useSelector(state => state.routing.instruction)
-    let instructionElement = null
+    let topBarElement = null
     if (instruction) {
-        instructionElement =
+        topBarElement =
             <Card>
                 <CardHeader>
                     {instruction.text}
                 </CardHeader>
             </Card>
+    }else{
+        topBarElement = <Card>
+            <CardHeader>
+                <SearchbarField
+                    init={true}
+                    inline={true}
+                    placeholder={"Suche deinen Weg"}
+                    onInput={(e) => setSearch(e.target.value)}
+                    onSubmit={onClickSearch}
+                    disableButton={true}
+                    disableButtonText={"CANCEL"}
+                    backdropEl={false}
+                />
+            </CardHeader>
+        </Card>
     }
     return (
         <Page name="home">
             <MapComponent />
             <Overlay>
-                {instructionElement}
+                {topBarElement}
                 <SettingsButton href="/settings" sheetClose={true}>
                     <FontAwesomeIcon icon={faList}/>
                 </SettingsButton>
