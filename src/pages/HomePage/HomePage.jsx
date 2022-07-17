@@ -43,6 +43,7 @@ import { height } from 'dom7';
 
 const HomePage = () => {
     const dispatch = useDispatch()
+    const sheetRef = useRef()
     const routingActive = useSelector(state => state.routing.routingActive)
     const currentPosition = useSelector(state => state.routing.currentPosition)
     const targetPosition = useSelector(state => state.routing.targetPosition)
@@ -197,6 +198,16 @@ const HomePage = () => {
     },[targetPosition])
 
 
+    useEffect(()=>{
+        if(!sheetRef.current)return
+        if(targetPosition){
+            sheetRef.current.f7Sheet().open()
+            sheetRef.current.f7Sheet().stepClose()
+            setTimeout(()=>sheetRef.current.f7Sheet().stepClose(),100)
+        }
+
+    },[targetPosition])
+
     /**
      * Navigation instructions
      */
@@ -245,7 +256,8 @@ const HomePage = () => {
                 </Fab>
             </Overlay>
             <Sheet
-                opened={targetPosition!=undefined}
+                ref={sheetRef}
+                opened={false}
                 className="demo-sheet-swipe-to-step"
                 style={{height: 'auto', '--f7-sheet-bg-color': '#fff'}}
                 swipeToStep
