@@ -26,7 +26,7 @@ import {
     FavoritesButton
 } from "./HomePage.elements";
 
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
     setRoutingActive,
     removeFavorite,
@@ -93,67 +93,89 @@ const HomePage = () => {
     const navigate = useCallback(() => {
         dispatch(setRoutingActive(!routingActive))
     }, [routingActive])
-    
-    const selectBasic = useCallback(()=>{
+
+    const selectBasic = useCallback(() => {
         dispatch(setTileLayer(0))
     })
 
-    const selectLayer1 = useCallback(()=>{
+    const selectLayer1 = useCallback(() => {
         dispatch(setTileLayer(1))
     })
 
     /**
      * @return true if the currently selected targetlocation is a user faforite false if not
      */
-    const isTargetFavorite = useCallback(()=>{
-        if (!favorites || !targetPosition)return false
-        for(let favorite of favorites){
-            if(favorite.pageid == targetPosition.pageid){
+    const isTargetFavorite = useCallback(() => {
+        if (!favorites || !targetPosition) return false
+        for (let favorite of favorites) {
+            if (favorite.pageid == targetPosition.pageid) {
                 return true
             }
         }
         return false
-    },[targetPosition,favorites])
-    
-    const selectLayer2 = useCallback(()=>{
+    }, [targetPosition, favorites])
+
+    const selectLayer2 = useCallback(() => {
         dispatch(setTileLayer(2))
     })
     /**
      * onclick for the faforite button,
      * toggles the favorite state of the selected target
      */
-    const toggleFavorite = useCallback(()=>{
-        if (!favorites || !targetPosition)return
-        if(isTargetFavorite()){
+    const toggleFavorite = useCallback(() => {
+        if (!favorites || !targetPosition) return
+        if (isTargetFavorite()) {
             dispatch(removeFavorite(targetPosition))
             return
         }
         dispatch(addFavorite(targetPosition))
-    },[targetPosition,favorites,isTargetFavorite])
+    }, [targetPosition, favorites, isTargetFavorite])
 
     const onClickSearch = useCallback((e) => {
         e.preventDefault()
-        findWikiEntriesByTitle(search).then((value) => {
-            const b = value[0]
-            let c;
-            for (let [key] of Object.entries(b)) {
-                c = key
+        let lowercasetext = search.toLowerCase();
+        findWikiEntriesByTitle(lowercasetext).then((value) => {
+            const b = value[1]
+            let c
+            if (value.length > 1) {
+                if (b[-1] == null) {
+                    for (let [key] of Object.entries(b)) {
+                        c = key
+                    }
+                    const finalPosition = b[c]["coordinates"]
+                    const lat = finalPosition[0]["lat"]
+                    const lon = finalPosition[0]["lon"]
+                    let wikiEntrie = {
+                        lat: lat,
+                        lon: lon,
+                        ...b[c]
+                    }
+                    dispatch(setTargetPosition(wikiEntrie))
+                }
+                else {
+                    f7.dialog.alert("Leider haben wir für diese Suche keine Ergebnisse gefunden")
+                }
             }
-            const finalPosition = b[c]["coordinates"]
-            if(!finalPosition){
-                f7.dialog.alert("Leider haben wir für diese Suche keine Ergebnisse gefunden")
-                return
+            else {
+                for (let [key] of Object.entries(b)) {
+                    c = key
+                }
+                const finalPosition = b[c]["coordinates"]
+                if (!finalPosition) {
+                    f7.dialog.alert("Leider haben wir für diese Suche keine Ergebnisse gefunden")
+                    return
+                }
+                const lat = finalPosition[0]["lat"]
+                const lon = finalPosition[0]["lon"]
+                let wikiEntrie = {
+                    lat: lat,
+                    lon: lon,
+                    ...b[c]
+                }
+                dispatch(setTargetPosition(wikiEntrie))
             }
-            const lat = finalPosition[0]["lat"]
-            const lon = finalPosition[0]["lon"]
-            let wikiEntrie = {
-                lat: lat, 
-                lon: lon,
-                ...b[c]
-            }
-            dispatch(setTargetPosition(wikiEntrie))
         });
-    },[search])
+    }, [search])
 
     /**
      * get the full wiki page
@@ -174,7 +196,7 @@ const HomePage = () => {
     /**
      * Navigation instructions
      */
-     
+
     const instruction = useSelector(state => state.routing.instruction)
     let topBarElement = null
     if (instruction) {
@@ -184,7 +206,7 @@ const HomePage = () => {
                     {instruction.text}
                 </CardHeader>
             </Card>
-    }else{
+    } else {
         topBarElement = <Card>
             <CardHeader>
                 <SearchbarField
@@ -206,15 +228,15 @@ const HomePage = () => {
             <Overlay>
                 {topBarElement}
                 <SettingsButton href="/settings" sheetClose={true}>
-                    <FontAwesomeIcon icon={faList}/>
+                    <FontAwesomeIcon icon={faList} />
                 </SettingsButton>
                 <Fab border-radius="5%">
                     <Icon>Layer</Icon>
                     <Icon>Layer</Icon>
                     <FabButtons position="bottom">
-                        <FabRegular id="fabButton1" onClick={selectBasic}/>
-                        <FabSattelite id="fabButton2" onClick={selectLayer1}/>
-                        <FabPainting id="fabButton3" onClick={selectLayer2}/>
+                        <FabRegular id="fabButton1" onClick={selectBasic} />
+                        <FabSattelite id="fabButton2" onClick={selectLayer1} />
+                        <FabPainting id="fabButton3" onClick={selectLayer2} />
                     </FabButtons>
                 </Fab>
             </Overlay>
