@@ -141,16 +141,20 @@ const HomePage = () => {
             let c
             if (value.length > 1) {
                 if (b[-1] == null) {
-                    for (let [key] of Object.entries(b)) {
-                        c = key
-                    }
-                    const finalPosition = b[c]["coordinates"]
-                    const lat = finalPosition[0]["lat"]
-                    const lon = finalPosition[0]["lon"]
-                    let wikiEntrie = {
-                        lat: lat,
-                        lon: lon,
-                        ...b[c]
+                    try{
+                        for (let [key] of Object.entries(b)) {
+                            c = key
+                        }
+                        const finalPosition = b[c]["coordinates"]
+                        const lat = finalPosition[0]["lat"]
+                        const lon = finalPosition[0]["lon"]
+                        let wikiEntrie = {
+                            lat: lat,
+                            lon: lon,
+                            ...b[c]
+                        }
+                    }catch{
+                        f7.dialog.alert("Leider haben wir für diese Suche keine Ergebnisse gefunden")
                     }
                     dispatch(setTargetPosition(wikiEntrie))
                 }
