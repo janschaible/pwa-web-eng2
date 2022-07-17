@@ -299,17 +299,23 @@ const HomePage = () => {
                         <div style={{ display: "flex",justifyContent:"space-around",flexWrap:"wrap"}}>
                             <div>
                                 <h1>Deine Position:</h1>
-                                <h2 style={{marginLeft: "50px"}}>{currentCountry}</h2>
-                                <h3 style={{marginLeft: "50px"}}>{currentState}</h3>
-                                <h3 style={{marginLeft: "50px"}}>{currentCity}</h3>
-                                <h3 style={{marginLeft: "50px"}}>{currentStreet} {currentHousenumber}</h3>
+                                <h2 style={{marginLeft: "50px"}}>{currentCountry!="undefined"?currentCountry:""}</h2>
+                                <h3 style={{marginLeft: "50px"}}>{currentState!="undefined"?currentState:""}</h3>
+                                <h3 style={{marginLeft: "50px"}}>{currentCity!="undefined"?currentCity:""}</h3>
+                                <h3 style={{marginLeft: "50px"}}>
+                                    {currentStreet!="undefined"?currentStreet:""} 
+                                    {currentHousenumber!="undefined"?currentHousenumber:""}
+                                </h3>
                             </div>
                             <div>
                                 <h1>Die Zielposition:</h1>
-                                <h2 style={{marginLeft: "50px"}}>{targetCountry}</h2>
-                                <h3 style={{marginLeft: "50px"}}>{targetState}</h3>
-                                <h3 style={{marginLeft: "50px"}}>{targetCity}</h3>
-                                <h3 style={{marginLeft: "50px"}}>{targetStreet} {targetHousenumber}</h3>
+                                <h2 style={{marginLeft: "50px"}}>{targetCountry!="undefined"?targetCountry:""}</h2>
+                                <h3 style={{marginLeft: "50px"}}>{targetState!="undefined"?targetState:""}</h3>
+                                <h3 style={{marginLeft: "50px"}}>{targetCity!="undefined"?targetCity:""}</h3>
+                                <h3 style={{marginLeft: "50px"}}>
+                                    {targetStreet!="undefined"?targetStreet:""} 
+                                    {targetHousenumber!="undefined"?targetHousenumber:""}
+                                </h3>
                             </div>
                         </div>
                     </div>
