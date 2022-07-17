@@ -37,7 +37,6 @@ export async function getLocation(lat, lon){
             locationString = locationString + locArray[i] + "\n";
         }
     }
-    console.log(locationString);
 
     return locationString;
 }

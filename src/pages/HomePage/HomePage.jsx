@@ -38,10 +38,10 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faList,faArrowUp} from '@fortawesome/free-solid-svg-icons'
 import {getLocation} from "../../js/rev-geo";
-import {findWikiEntriesByTitle,findWikiByPageID} from "@/features/wikiPosts/wikiEntries";
+import {findWikiEntriesByTitle,findWikiByPageID,findImageById} from "@/features/wikiPosts/wikiEntries";
+import { height } from 'dom7';
 
 const HomePage = () => {
-    const sheetRef = useRef()
     const dispatch = useDispatch()
     const routingActive = useSelector(state => state.routing.routingActive)
     const currentPosition = useSelector(state => state.routing.currentPosition)
@@ -59,6 +59,7 @@ const HomePage = () => {
     const [targetHousenumber, setTargetHousenumber] = useState()
     const [search,setSearch] = useState()
     const [targetDescription,setTargetDescription] = useState()
+    const [targetImageURL,setTargetImageURL] = useState()
 
     useEffect(() => {
         if (currentPosition != null) {
@@ -183,13 +184,16 @@ const HomePage = () => {
     useEffect(()=>{
         if(!targetPosition){
             setTargetDescription(null)
+            setTargetImageURL(null)
             return
         }
-        console.log("searching for page")
-        findWikiByPageID(targetPosition.pageid).then((response)=>{
-            console.log(response)
+        const update = async()=>{
+            let response = await findWikiByPageID(targetPosition.pageid)
             setTargetDescription(response?response.extract:null)
-        })
+            response = await findImageById(targetPosition.pageid)
+            setTargetImageURL(response)
+        }
+        update()
     },[targetPosition])
 
 
@@ -241,7 +245,6 @@ const HomePage = () => {
                 </Fab>
             </Overlay>
             <Sheet
-                ref={sheetRef}
                 opened={targetPosition!=undefined}
                 className="demo-sheet-swipe-to-step"
                 style={{height: 'auto', '--f7-sheet-bg-color': '#fff'}}
@@ -279,9 +282,20 @@ const HomePage = () => {
                     </DetailButtonContainer>
                 </div>
                 {/* Rest of the sheet content that will opened with swipe */}
-                {routingActive?"":(
-                    <div style={{padding:"0 2rem 2rem 2rem"}}>
-                        <p>{targetDescription}</p>
+                    <div style={{
+                        padding:"0 2rem 2rem 2rem",
+                        overflow: "auto",
+                        height: "100vh"
+                    }}>
+                        <div>
+                            {targetImageURL?<img style={{
+                                maxWidth:"10rem",
+                                maxHeight:"10rem",
+                                float: "left",
+                                marginRight:"3rem"
+                            }} src={targetImageURL}/>:""}
+                            <p>{targetDescription}</p>
+                        </div>
                         <div style={{ display: "flex",justifyContent:"space-around",flexWrap:"wrap"}}>
                             <div>
                                 <h1>Deine Position:</h1>
@@ -299,7 +313,6 @@ const HomePage = () => {
                             </div>
                         </div>
                     </div>
-                )}
 
             </Sheet>
         </Page>

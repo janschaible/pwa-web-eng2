@@ -65,16 +65,22 @@ export async function findWikiEntriesByTitle(title) {
 export async function findWikiByPageID(id){
   const url = `https://de.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&pageids=${id}`
   try {
-    console.log(id)
     const response = await fetch(url)
-    console.log("response",response)
     const marsheledResponse = await response.json()
-    console.log("marsheledResponse",marsheledResponse)
     const pages = marsheledResponse.query;
-    console.log("pages",pages.pages[id])
     return pages.pages[id]
   } catch (error){
-    console.log(error)
+  }
+}
+
+export async function findImageById(id){
+  const url = `http://de.wikipedia.org/w/api.php?origin=*&action=query&prop=pageimages&format=json&piprop=original&pageids=${id}`
+  try {
+    const response = await fetch(url)
+    const marsheledResponse = await response.json()
+    const pages = marsheledResponse.query;
+    return pages.pages[id].original.source
+  } catch (error){
   }
 }
 
