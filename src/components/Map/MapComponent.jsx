@@ -5,7 +5,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {Map} from './MapComponent.elements'
-import {TileLayer,Polyline,Marker,useMapEvents, Popup, WMSTileLayer }from 'react-leaflet'
+import {Polyline,Marker,useMapEvents }from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import Routing from '@/components/Routing/Routing'
 import {useDispatch, useSelector} from 'react-redux';
@@ -18,12 +18,8 @@ import {
     setTargetPosition
 } from '@/features/routing/routingSlice'
 import {f7} from 'framework7-react';
-import {findWikiEntries, findWikiEntriesByTitle, findWikiPageId } from "@/features/wikiPosts/wikiEntries";
-import { onsubmit } from '../../pages/HomePage/HomePage';
-import { SearchbarField } from '../Map/MapComponent.elements';
-import { value } from 'dom7';
-import { map } from 'leaflet';
-import { setFollowing } from '../../features/routing/routingSlice';
+import {findWikiEntries} from "@/features/wikiPosts/wikiEntries";
+import L from 'leaflet'
 
 /**
  * Component handles any event that requires access to the map
@@ -38,7 +34,9 @@ const EventHandeler = () => {
     const following = useSelector(state => state.routing.following)
     const routingActive = useSelector(state => state.routing.routingActive)
     const targetPosition = useSelector(state => state.routing.targetPosition)
-    const searchingActive = useSelector(state => state.routing.searchingActive)
+    const tileLayer = useSelector(state=>state.routing.tileLayer)
+    const [activeLayer,setActiveLayer] = useState()
+
     /**
      * update the position and zoom of the map into redux store
      */
@@ -60,7 +58,47 @@ const EventHandeler = () => {
             clearInterval(locationPoller)
         }
     }, [locationPoller])
-    
+
+    /**
+     * Setting the choosen layer to the map
+     */
+    useEffect(()=>{
+        if(!map)return
+        if(activeLayer){
+            map.removeLayer(activeLayer)
+            setActiveLayer(null)
+        }
+        if (tileLayer==0) {
+            const layer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+                attribution:"&copy; <a href=&quot;https://www.openstreetmap.org/copyright&quot;>OpenStreetMap</a> contributors"
+
+            })
+            setActiveLayer(layer)
+            map.addLayer(layer)
+        }
+        if (tileLayer==1) {
+            const layer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+                maxZoom: 20,
+                subdomains: ['mt1','mt2','mt3']
+            })
+            setActiveLayer(layer)
+            map.addLayer(layer)
+        }
+        if (tileLayer==2) {
+            const layer = L.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png",
+            {
+                attribution:
+                    'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+                    '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+                    "Map data {attribution.OpenStreetMap}",
+                minZoom: 1,
+                maxZoom: 16
+            })
+            setActiveLayer(layer)
+            map.addLayer(layer)
+        }
+    }, [tileLayer])
+
     /**
      * fly to the users position when the map is started
      * has to be done with a variable from redux since there was some wired behaviour
@@ -141,8 +179,6 @@ const EventHandeler = () => {
  *  and the routing component so that they have access to the map 
  */
 const MapComponent = ()=>{
-    const tileLayer = useSelector(state=>state.routing.tileLayer)
-    const [searchingActive, setSearchingActive] = useState(true)
     const [wikiEntries, setWikiEntries] = useState()
     const dispatch = useDispatch()
     const routingActive = useSelector(state=>state.routing.routingActive)
@@ -183,36 +219,6 @@ const MapComponent = ()=>{
                 dispatch(setTargetPosition(entrie))
             },
         }), [])
-    let search = ''
-    const [c1, setC1] = useState(0)
-    const [c2, setC2] = useState(0)
-    let searchPrint = ''
-    var c = 0
-    let b = ['']
-    var d = 0
-    var j = 0
-    var finalPosition = []
-    const getLayer = useCallback(()=>{
-        console.log(tileLayer)
-        if(tileLayer == 0){
-            return <TileLayer
-                noWrap={true}
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-        } else if(tileLayer == 1){
-            return <TileLayer
-                url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
-                maxZoom={20}
-                subdomains={['mt1','mt2','mt3']}
-            />
-        } else if(tileLayer == 2){
-            return <WMSTileLayer
-                layers={'TOPO-OSM-WMS'}
-                url={`http://ows.mundialis.de/services/service?`}
-            />
-        }
-    }, [tileLayer])
 
     /**
      * the map center is only set once on initialization
@@ -232,92 +238,6 @@ const MapComponent = ()=>{
             maxBoundsViscosity={0.8}
             minZoom={3}
         >
-            {getLayer()}
-
-            <SearchbarField
-                init={true}
-                inline={true}
-                placeholder={"Suche deinen Weg"}
-                onInput={async (e) => {
-                    search = e.target.value
-                    searchPrint = search
-                }}
-                onSubmit={async (e) => {
-                    e.preventDefault()
-                    var mapPos = [0, 0]
-                    searchPrint = await findWikiEntriesByTitle(search).then((value) => {
-                        b = value[0]
-                        for (let [key] of Object.entries(b)) {
-                            c = key
-                        }
-                        finalPosition = b[c]["coordinates"]
-                        d = finalPosition[0]["lat"]
-                        j = finalPosition[0]["lon"]
-                        setC1(d)
-                        setC2(j)
-                        setSearchingActive(false)
-                        var mapPos = [c1, c2]
-                        //setMapPosition(mapPos)
-                        //console.log(mapPos)
-                    });
-                    setMapPosition(mapPos)
-                    console.log(mapPosition)
-                }
-                }
-                onClickDisable={true}
-                disableButton={false}
-                onClickClear={() => {
-                    setSearchingActive(true)
-                }}
-                backdropEl={false}
-            />
-            <SearchbarField
-                init={true}
-                inline={true}
-                placeholder={"Suche deinen Weg"}
-                onInput={(e) => {
-                    search = e.target.value
-                    searchPrint = search
-                }}
-                onSubmit={async (e) => {
-                    e.preventDefault()
-                    var mapPos = [0, 0]
-                    searchPrint = await findWikiEntriesByTitle(search).then((value) => {
-                        b = value[0]
-                        console.log(value)
-                        for (let [key] of Object.entries(b)) {
-                            c = key
-                        }
-                        finalPosition = b[c]["coordinates"]
-                        d = finalPosition[0]["lat"]
-                        j = finalPosition[0]["lon"]
-                        setC1(d)
-                        setC2(j)
-                        setSearchingActive(false)
-                        var mapPos = [c1, c2]
-                        let wikiEntrie = {
-                            lat: d, 
-                            lon: j,
-                            ...b[c]
-                        }
-                        dispatch(setTargetPosition(wikiEntrie))
-                        //dispatch(setTargetPosition())
-                        //setMapPosition(mapPos)
-                        //console.log(mapPos)
-
-                    });
-                    //console.log(mapPosition)
-                }
-                }
-                
-                disableButton={true}
-                disableButtonText={"cANCEL"}
-                onClickClear={() => {
-                    setSearchingActive(true)
-                }}
-                backdropEl={false}
-            />
-            {!searchingActive ? <Marker position={[c1, c2]} >Hallo</Marker> : <></>}
             {getLastPathPoly()}
             {wikiEntries && !routingActive ? wikiEntries.map(entrie => {
                 return (
@@ -336,22 +256,3 @@ const MapComponent = ()=>{
 }
 
 export default MapComponent
-
-/*
-
-            <TileLayer
-                url='https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'
-                maxZoom={20}
-                subdomains={['mt1','mt2','mt3']}
-            />
-            
-            <TileLayer
-            noWrap={true}
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <WMSTileLayer
-                layers={'TOPO-OSM-WMS'}
-                url={`http://ows.mundialis.de/services/service?`}
-            />
-*/

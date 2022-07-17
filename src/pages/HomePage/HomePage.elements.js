@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Link, Button, Sheet} from 'framework7-react';
+import { Link, Button, Sheet,FabButton,Searchbar} from 'framework7-react';
 
 export const Overlay = styled.div`
   position: absolute;
@@ -8,11 +8,16 @@ export const Overlay = styled.div`
   right: 0;
   z-index: 1000;
   pointer-events: none;
+  padding-bottom: 75px; //controls where the layerbutton sits since it sits at the bottom of the container
   display: flex;
   flex-direction: column;
   *{
     pointer-events: all;
   }
+`
+
+export const SearchbarField = styled(Searchbar)`
+  width: 100% !important;
 `
 
 export const SettingsButton = styled(Link)`
@@ -82,4 +87,19 @@ export const FavoritesButton = styled(Button)`
         }
         return "blue"
       }};
+`
+
+export const FabRegular = styled(FabButton)`
+  background-image: url(/images/map_img1.png) !important;
+  background-size: 50px;
+`
+
+export const FabSattelite = styled(FabButton)`
+  background-image: url(/images/map_img2.png) !important;
+  background-size: 50px;
+`
+
+export const FabPainting = styled(FabButton)`
+  background-image: url(/images/map_img3.png) !important;
+  background-size: 50px;
 `
