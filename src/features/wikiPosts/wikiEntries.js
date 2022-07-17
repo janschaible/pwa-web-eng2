@@ -11,7 +11,7 @@ export async function findWikiEntries(lat, lon, mapZoom) {
     gsradius = 4500;
     maxfinds = mapZoom * 12;
   }
-  var url = "https://en.wikipedia.org/w/api.php";
+  var url = "https://de.wikipedia.org/w/api.php";
   var params = {
     action: "query",
     list: "geosearch",
@@ -38,7 +38,7 @@ export async function findWikiEntries(lat, lon, mapZoom) {
 
 export async function findWikiEntriesByTitle(title) {
   const collection = [];
-  var url = "https://en.wikipedia.org/w/api.php";
+  var url = "https://de.wikipedia.org/w/api.php";
   var params = {
     action: "query",
     prop: "coordinates",
@@ -63,21 +63,24 @@ export async function findWikiEntriesByTitle(title) {
 }
 
 export async function findWikiByPageID(id){
-  `https://de.wikipedia.org/w/api.php?format=json&action=parse&pageid=${id}`
+  const url = `https://de.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&pageids=${id}`
   try {
-    console.log(`https://de.wikipedia.org/w/api.php?format=json&action=parse&pageid=${id}`)
+    console.log(id)
     const response = await fetch(url)
     console.log("response",response)
     const marsheledResponse = await response.json()
+    console.log("marsheledResponse",marsheledResponse)
     const pages = marsheledResponse.query;
-    return pages[0]
-  } catch {
+    console.log("pages",pages.pages[id])
+    return pages.pages[id]
+  } catch (error){
+    console.log(error)
   }
 }
 
 export async function findWikiPageId(title) {
   const collection = [];
-  var url = "https://en.wikipedia.org/w/api.php";
+  var url = "https://de.wikipedia.org/w/api.php";
   var params = {
     action: "query",
     prop: "coordinates",

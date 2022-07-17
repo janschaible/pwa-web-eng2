@@ -163,7 +163,9 @@ const HomePage = () => {
             setTargetDescription(null)
             return
         }
+        console.log("searching for page")
         findWikiByPageID(targetPosition.pageid).then((response)=>{
+            console.log(response)
             setTargetDescription(response?response.extract:null)
         })
     },[targetPosition])
@@ -256,7 +258,7 @@ const HomePage = () => {
                 </div>
                 {/* Rest of the sheet content that will opened with swipe */}
                 {routingActive?"":(
-                    <div style={{paddingBottom:"2rem"}}>
+                    <div style={{padding:"0 2rem 2rem 2rem"}}>
                         <p>{targetDescription}</p>
                         <div style={{ display: "flex",justifyContent:"space-around",flexWrap:"wrap"}}>
                             <div>
